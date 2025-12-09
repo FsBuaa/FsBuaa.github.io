@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>标准研制 - 国家市场监督管理总局技术创新中心</title>
+    <title>国家市场监督管理总局技术创新中心（新能源汽车数字监管技术及应用）</title>
+    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -16,161 +18,221 @@
                         'tech-dark': '#003380',
                         'text-main': '#333333',
                     },
-                    fontFamily: { 'sans': ['Microsoft YaHei', 'sans-serif'] }
+                    fontFamily: {
+                        'slogan': ['STKaiti', 'KaiTi', '楷体', 'FangSong', 'SimSun', 'serif'], 
+                        'sans': ['Microsoft YaHei', 'PingFang SC', 'sans-serif'],
+                    }
                 }
             }
         }
     </script>
     <style>
         body { font-family: "Microsoft YaHei", sans-serif; }
-        /* 头部背景 */
-        .header-tech-bg {
-            background-color: #001540;
-            background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), linear-gradient(to right, #001540, #003380, #001540);
-            position: relative;
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        .header-tech-bg::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px; pointer-events: none;
-        }
-        /* 导航特效 */
+        /* 导航栏特效 */
         .nav-item { position: relative; }
         .nav-item::after {
             content: ''; position: absolute; bottom: 8px; left: 50%; width: 0%; height: 2px;
             background-color: #fff; transform: translateX(-50%); transition: width 0.3s ease;
         }
         .nav-item:hover::after { width: 60%; }
-        /* 状态标签样式 */
-        .status-active { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } /* 现行 */
-        .status-draft { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; } /* 征求意见 */
-        .status-upcoming { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } /* 即将实施 */
+        
+        /* 下拉菜单动画 */
+        .group:hover .group-hover\:block { display: block; animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 头部科技感背景纹理 --- */
+        .header-tech-bg {
+            background-color: #001540;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                linear-gradient(to right, #001540, #003380, #001540);
+            position: relative;
+        }
+        .header-tech-bg::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-[#333] flex flex-col min-h-screen">
+<body class="bg-gray-50 text-[#333]">
 
     <!-- ================= 1. 顶部 Header ================= -->
     <div class="w-full text-white pb-0 header-tech-bg">
         <header class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-7 relative z-10">
             <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+                <!-- 左侧：Logo + 标题 -->
                 <div class="flex items-center gap-5 self-start lg:self-center">
                     <div class="w-16 h-16 shrink-0 flex items-center justify-center">
-                        <img src="figure/nevsc_logo.png" alt="Logo" class="w-full h-full object-contain drop-shadow-md" onerror="this.parentElement.innerHTML='LOG'">
+                        <img src="figure/nevsc_logo.png" alt="Logo" class="w-full h-full object-contain drop-shadow-md" 
+                             onerror="this.parentElement.innerHTML='<div class=\'text-white font-bold border border-white/30 p-2 rounded\'>LOGO</div>'">
                     </div>
                     <div class="flex flex-col justify-center gap-1">
-                        <h1 class="text-sm md:text-lg text-blue-100 font-bold tracking-wide opacity-90 text-justify">国家市场监督管理总局技术创新中心</h1>
-                        <h2 class="text-sm md:text-lg text-blue-100 font-medium tracking-wide opacity-90 text-justify">(新能源汽车数字监管技术及应用)</h2>
+                        <h1 class="text-sm md:text-lg text-blue-100 font-bold tracking-wide opacity-90 text-justify">
+                            国家市场监督管理总局技术创新中心
+                        </h1>
+                        <h2 class="text-sm md:text-lg text-blue-100 font-medium tracking-wide opacity-90 text-justify">
+                            (新能源汽车数字监管技术及应用)
+                        </h2>
                     </div>
                 </div>
+
+                <!-- 右侧：搜索 -->
                 <div class="flex flex-col items-end gap-2 w-full lg:w-auto mt-4 lg:mt-0">
-                    <div class="relative w-full md:w-64 group">
+                    <div class="relative w-full md:w-64 group"> <!-- 稍微调宽了一点到 w-64 -->
+                        
+                        <!-- 1. Input: 添加 autocomplete="off" -->
                         <input type="text" id="global-search-input" placeholder="输入关键词..." autocomplete="off"
                             class="w-full bg-white/10 border border-white/20 text-white text-sm rounded-full pl-4 pr-10 py-1.5 
                                     focus:outline-none focus:bg-white/15 focus:border-blue-300 transition shadow-inner backdrop-blur-sm">
+                        
+                        <!-- 2. Button: 保持不变 -->
                         <button id="global-search-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition">
                             <i class="fa-solid fa-magnifying-glass text-lg"></i>
                         </button>
+
+                        <!-- 3. 【新增】下拉结果容器 -->
+                        <!-- 使用 absolute 定位，z-50 保证在最上层，默认 hidden -->
+                        <div id="search-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden z-50">
+                            <!-- JS 将会在这里动态插入内容 -->
+                        </div>
+
                     </div>
                 </div>
             </div>
         </header>
+
+        <!-- ================= 2. 导航栏 ================= -->
         <nav class="border-t border-white/10 mt-2 relative z-10" style="background-color: rgba(255, 255, 255, 0.05);"> 
             <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-wrap justify-center space-x-2">
-                    <a href="index.html" class="nav-item text-blue-100 hover:text-white px-8 py-4 text-base tracking-widest transition relative">首页</a>
+                    <a href="index.html" class="text-white font-bold px-8 py-4 text-base tracking-widest relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-white">首页</a>
                     <a href="about.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">中心概况</a>
-                    <a href="news.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
+                    <a href="news.html?category=news" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
                     <a href="activity.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">行业活动</a>
-                    <a href="standards.html" class="text-white font-bold px-6 py-4 font-medium transition text-base tracking-wide relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-white">标准研制</a>
+                    <a href="standards.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">标准研制</a>
                     <a href="research.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">技术研究</a>
+                    <div class="relative group h-full">
+                        <button class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition flex items-center h-full text-base tracking-wide">
+                            更多 <i class="fa-solid fa-angle-down ml-2 text-xs opacity-70"></i>
+                        </button>
+                        <div class="absolute left-0 top-full w-36 bg-white shadow-xl rounded-b-md hidden group-hover:block z-50">
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098] border-b border-gray-50">党建风采</a>
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098] border-b border-gray-50">人才招聘</a>
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098]">联系我们</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
     </div>
 
-    <!-- 面包屑 -->
-    <div class="bg-white border-b border-gray-200 shadow-sm">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div class="text-sm text-gray-500 flex items-center">
-                <a href="index.html" class="hover:text-[#004098] transition"><i class="fa-solid fa-house mr-1"></i> 首页</a>
-                <span class="mx-2 text-gray-300">/</span>
-                <span class="text-gray-800 font-medium">标准研制</span>
+    <!-- ================= 3. 首屏轮播 (动态版) ================= -->
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-0">
+        <!-- 容器 ID: banner-container -->
+        <div id="banner-container" class="relative w-full h-[350px] md:h-[500px] overflow-hidden group bg-gray-200">
+            
+            <!-- 轮播内容轨道 -->
+            <div id="banner-track" class="w-full h-full relative">
+                <!-- JS 将在这里动态插入 slides -->
+                <div class="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
+                </div>
             </div>
+
+            <!-- 指示点 (Dots) -->
+            <div id="banner-dots" class="absolute bottom-6 left-8 z-20 flex gap-3">
+                <!-- JS 将在这里插入 dots -->
+            </div>
+
+            <!-- 左右箭头 -->
+            <button id="banner-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/20 hover:bg-[#004098] text-white flex items-center justify-center rounded-full transition opacity-0 group-hover:opacity-100 backdrop-blur-sm z-20">
+                <i class="fa-solid fa-chevron-left text-xl"></i>
+            </button>
+            <button id="banner-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/20 hover:bg-[#004098] text-white flex items-center justify-center rounded-full transition opacity-0 group-hover:opacity-100 backdrop-blur-sm z-20">
+                <i class="fa-solid fa-chevron-right text-xl"></i>
+            </button>
         </div>
     </div>
 
-    <!-- ================= 3. 内容主体 ================= -->
-    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
-        
-        <!-- 搜索与筛选区 -->
-        <div class="bg-white p-6 rounded shadow-sm border border-gray-100 mb-8">
-            <div class="flex flex-col md:flex-row gap-4 items-center">
-                <!-- 搜索框 -->
-                <div class="relative flex-1 w-full">
-                    <input type="text" id="searchInput" placeholder="输入标准号或标准名称..." 
-                           class="w-full border border-gray-300 rounded px-4 py-2.5 focus:outline-none focus:border-[#004098] transition">
-                    <button id="searchBtn" class="absolute right-0 top-0 h-full bg-[#004098] text-white px-6 rounded-r hover:bg-[#003380] transition">
-                        <i class="fa-solid fa-search"></i> 检索
-                    </button>
-                </div>
-            </div>
+    <!-- ================= 4. 内容主体区域 ================= -->
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- 错误提示容器 -->
+        <div id="error-alert" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+            <p class="font-bold">连接错误</p>
+            <p id="error-msg">无法连接到数据库，请检查网络。</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <!-- 分类 Tabs -->
-            <div class="flex gap-2 mt-6 border-b border-gray-200 overflow-x-auto">
-                <button data-type="all" class="std-tab px-6 py-2 text-sm font-bold text-[#004098] border-b-2 border-[#004098] hover:bg-gray-50 transition whitespace-nowrap">全部</button>
-                <button data-type="GB" class="std-tab px-6 py-2 text-sm text-gray-600 border-b-2 border-transparent hover:text-[#004098] hover:bg-gray-50 transition whitespace-nowrap">国家标准</button>
-                <button data-type="QC" class="std-tab px-6 py-2 text-sm text-gray-600 border-b-2 border-transparent hover:text-[#004098] hover:bg-gray-50 transition whitespace-nowrap">行业标准</button>
-                <button data-type="DB" class="std-tab px-6 py-2 text-sm text-gray-600 border-b-2 border-transparent hover:text-[#004098] hover:bg-gray-50 transition whitespace-nowrap">地方标准</button>
-                <button data-type="T" class="std-tab px-6 py-2 text-sm text-gray-600 border-b-2 border-transparent hover:text-[#004098] hover:bg-gray-50 transition whitespace-nowrap">团体标准</button>
-            </div>
-        </div>
+            <!-- 左侧：新闻动态 -->
+            <div class="lg:col-span-2 bg-white p-6 rounded shadow border border-gray-100">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-[#004098] flex items-center tracking-wide">
+                        <span class="w-1.5 h-6 bg-[#004098] mr-3 rounded-full"></span>新闻动态
+                    </h2>
+                    <a href="news.html?category=news" class="text-sm text-gray-400 hover:text-[#004098] transition flex items-center">
+                        查看更多 <i class="fa-solid fa-angle-right ml-1"></i>
+                    </a>
+                </div>
 
-        <!-- 标准列表 -->
-        <div class="bg-white rounded shadow-sm border border-gray-100 overflow-hidden min-h-[400px]">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50 text-gray-500 text-sm border-b border-gray-200">
-                    <tr>
-                        <th class="px-6 py-4 font-medium w-1/5 whitespace-nowrap">标准编号</th>
-                        <th class="px-6 py-4 font-medium w-2/5">标准名称</th>
-                        <th class="px-6 py-4 font-medium w-1/6 whitespace-nowrap">状态</th>
-                        <th class="px-6 py-4 font-medium w-1/6 whitespace-nowrap">发布日期</th>
-                        <!-- 修改：添加 whitespace-nowrap 强制不换行，并设定最小宽度 -->
-                        <th class="px-6 py-4 font-medium text-right whitespace-nowrap w-24">操作</th>
-                    </tr>
-                </thead>
-                <tbody id="standards-table-body" class="text-sm text-[#333]">
-                    <!-- JS 渲染内容 -->
-                    <tr>
-                        <td colspan="5" class="text-center py-10 text-gray-400">
-                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> 正在加载数据...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- 分页 -->
-            <div class="flex justify-between items-center p-6 border-t border-gray-100">
-                <span class="text-sm text-gray-500">共 <span id="total-count">0</span> 条记录</span>
-                <div class="flex gap-2">
-                    <button id="prevPage" class="px-3 py-1 border rounded text-gray-400 cursor-not-allowed" disabled>上一页</button>
-                    <button id="page1" class="px-3 py-1 bg-[#004098] text-white rounded">1</button>
-                    <button id="nextPage" class="px-3 py-1 border rounded hover:bg-gray-50 cursor-not-allowed" disabled>下一页</button>
+                <!-- 头条 (原本的位置，如果轮播图已经展示了头条，这里可以展示次头条或者列表，视情况而定) -->
+                <!-- 为了版面丰富，我们依然保留这个头条位置，展示最新的一条非轮播新闻，或者保持原样 -->
+                <div id="news-headline-container" class="min-h-[200px] flex items-center justify-center">
+                    <i class="fa-solid fa-spinner fa-spin text-[#004098] text-2xl"></i>
+                </div>
+
+                <!-- 列表 -->
+                <ul id="news-list-container" class="space-y-4 mt-8"></ul>
+            </div>
+
+            <!-- 右侧：通知公告 -->
+            <div class="lg:col-span-1 bg-white p-6 rounded shadow border border-gray-100">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-[#004098] flex items-center tracking-wide">
+                        <span class="w-1.5 h-6 bg-[#004098] mr-3 rounded-full"></span>通知公告
+                    </h2>
+                    <a href="news.html?category=notice" class="text-sm text-gray-400 hover:text-[#004098] transition">
+                        更多 <i class="fa-solid fa-angle-right ml-1"></i>
+                    </a>
+                </div>
+                <div id="notice-list-container" class="space-y-5">
+                    <div class="text-center text-gray-400 py-4"><i class="fa-solid fa-spinner fa-spin"></i></div>
                 </div>
             </div>
         </div>
-
     </main>
 
-    <!-- ================= 4. 页脚 ================= -->
-    <footer class="bg-[#1e293b] text-gray-400 pt-12 pb-8 mt-auto border-t-4 border-[#004098]">
+    <!-- ================= 5. 页脚 ================= -->
+    <footer class="bg-[#1e293b] text-gray-400 pt-12 pb-8 mt-10 border-t-4 border-[#004098]">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
                 <div class="col-span-1 md:col-span-2">
                     <h4 class="text-white font-bold text-lg mb-5 border-l-4 border-[#004098] pl-3">相关部门链接</h4>
                     <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
-                        <a href="https://www.samr.gov.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局</a>
-                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>总局召回中心</a>
-                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中国中检 (CCIC)</a>
-                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中检汽研</a>
+                        <a href="https://www.samr.gov.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局
+                        </a>
+                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>总局召回中心
+                        </a>
+                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国中检 (CCIC)
+                        </a>
+                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中检汽研
+                        </a>
                     </div>
                 </div>
                 <div class="col-span-1 md:col-span-1">
@@ -184,8 +246,15 @@
                 <div class="col-span-1 md:col-span-1 flex flex-col items-center md:items-start">
                     <h4 class="text-white font-bold text-lg mb-5">关注我们</h4>
                     <div class="flex items-center gap-4">
-                        <div class="bg-white p-1.5 rounded-lg shadow-lg"><img src="figure/QRcode.jpg" alt="微信公众号" class="w-20 h-20"></div>
-                        <div class="text-xs text-gray-400"><p class="mb-1 text-white font-bold">官方微信</p><p>扫一扫了解更多</p><p>行业动态</p></div>
+                        <div class="bg-white p-1.5 rounded-lg shadow-lg">
+                            <img src="figure/QRcode.jpg" 
+                                 alt="微信公众号" class="w-20 h-20">
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <p class="mb-1 text-white font-bold">官方微信</p>
+                            <p>扫一扫了解更多</p>
+                            <p>行业动态</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,222 +264,245 @@
         </div>
     </footer>
 
-    <!-- 数据脚本 -->
+    <!-- ================= 6. 后端数据读取脚本 (含轮播图逻辑) ================= -->
     <script type="module">
-        import { supabase } from './js/api.js';
-        
-        let currentType = 'all';
-        let currentKeyword = '';
-        let currentPage = 1;
-        const pageSize = 10;
-        let totalCount = 0;
-        
+        import { getArticles, getArticleById, incrementViews } from './js/api.js';
+
+        let bannerInterval;
+
         document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                await loadStandards();
-                setupEventListeners();
-            } catch (error) {
-                console.error('初始化失败:', error);
-                showError('页面初始化失败，请刷新重试');
-            }
-        });
-        
-        function setupEventListeners() {
-            // 搜索按钮事件
-            document.getElementById('searchBtn').addEventListener('click', () => {
-                currentKeyword = document.getElementById('searchInput').value.trim();
-                currentPage = 1;
-                loadAndFilterStandards();
-            });
-            
-            // 搜索框回车事件
-            document.getElementById('searchInput').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    currentKeyword = e.target.value.trim();
-                    currentPage = 1;
-                    loadAndFilterStandards();
-                }
-            });
-            
-            // 分页按钮事件
-            document.getElementById('prevPage').addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    loadAndFilterStandards();
-                }
-            });
-            
-            document.getElementById('nextPage').addEventListener('click', () => {
-                if (currentPage < Math.ceil(totalCount / pageSize)) {
-                    currentPage++;
-                    loadAndFilterStandards();
-                }
-            });
-        }
-        
-        async function loadStandards() {
-            await loadAndFilterStandards();
-        }
-        
-        async function loadAndFilterStandards() {
-            try {
-                showLoading();
-                
-                // 构建查询
-                let query = supabase
-                    .from('standards')
-                    .select('*', { count: 'exact' });
-                
-                // 类型过滤
-                if (currentType !== 'all') {
-                    query = query.eq('type', currentType);
-                }
-                
-                // 关键词搜索
-                if (currentKeyword) {
-                    query = query.or(`code.ilike.%${currentKeyword}%,title.ilike.%${currentKeyword}%`);
-                }
-                
-                // 排序和分页
-                const from = (currentPage - 1) * pageSize;
-                query = query
-                    .order('created_at', { ascending: false })
-                    .range(from, from + pageSize - 1);
-                
-                const { data, error, count } = await query;
-                
-                if (error) throw error;
-                
-                renderTable(data || []);
-                updatePagination(count || 0);
-                
-            } catch (error) {
-                console.error('加载标准失败:', error);
-                showError('数据加载失败，请检查网络连接');
-            }
-        }
-        
-        function renderTable(data) {
-            const tbody = document.getElementById('standards-table-body');
-            const totalCountElement = document.getElementById('total-count');
-            
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-gray-400">暂无相关标准</td></tr>';
-                totalCountElement.innerText = '0';
+            if (window.location.protocol === 'file:') {
+                showError("请使用 Live Server 运行！file:// 协议无法加载模块。");
                 return;
             }
+
+            try {
+                // 1. 获取新闻数据 (多获取几条，用于分配给轮播和列表)
+                // 获取 10 条新闻，5 条公告
+                const [newsData, noticeData] = await Promise.all([
+                    getArticles(10, 'news'),
+                    getArticles(5, 'notice')
+                ]);
+
+                // 2. 初始化轮播图 (取前 3-4 条作为轮播，优先取带图的)
+                // 简单的逻辑：前 3 条作为 Banner
+                const bannerData = newsData.slice(0, 3);
+                initBanner(bannerData);
+
+                // 3. 渲染下方的新闻列表 (跳过已在 Banner 展示的前3条，或者直接展示前几条)
+                // 这里我们跳过前 1 条作为列表头条(如果需要)，或者直接渲染
+                const listData = newsData.slice(0); // 也可以 slice(3) 如果不想重复
+                renderNewsSection(listData);
+
+                // 4. 渲染公告
+                renderNoticeSection(noticeData);
+
+            } catch (error) {
+                console.error('页面数据加载异常:', error);
+                showError("数据加载失败，请检查网络连接。");
+            }
+        });
+
+        // === 轮播图逻辑 ===
+        function initBanner(articles) {
+            const track = document.getElementById('banner-track');
+            const dotsContainer = document.getElementById('banner-dots');
             
-            totalCountElement.innerText = totalCount;
-            
-            const statusMap = {
-                'active': '<span class="status-active px-2 py-0.5 rounded text-xs">现行</span>',
-                'draft': '<span class="status-draft px-2 py-0.5 rounded text-xs">征求意见</span>',
-                'upcoming': '<span class="status-upcoming px-2 py-0.5 rounded text-xs">即将实施</span>'
-            };
-            
-            let html = '';
-            data.forEach(item => {
-                // 格式化日期
-                const publishDate = item.publish_date || item.created_at;
-                const formattedDate = publishDate ? formatDate(publishDate) : '-';
+            if (!articles || articles.length === 0) {
+                track.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">暂无轮播图片</div>';
+                return;
+            }
+
+            let slidesHtml = '';
+            let dotsHtml = '';
+
+            articles.forEach((item, index) => {
+                // 如果没有图，用默认图
+                const imgUrl = item.image_url || 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032';
+                // 默认第一张显示，其他隐藏 (opacity-0)
+                const activeClass = index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0';
                 
-                html += `
-                    <tr class="hover:bg-blue-50 transition border-b border-gray-100 last:border-0 cursor-pointer" onclick="window.location.href='standard-detail.html?id=${item.id}'">
-                        <td class="px-6 py-4 font-mono text-[#004098] font-bold whitespace-nowrap">${item.code || '无编号'}</td>
-                        <td class="px-6 py-4 font-medium">${item.title || '无标题'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${statusMap[item.status] || '<span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">未知</span>'}</td>
-                        <td class="px-6 py-4 text-gray-500 whitespace-nowrap">${formattedDate}</td>
-                        <td class="px-6 py-4 text-right whitespace-nowrap">
-                            <span class="text-[#004098] hover:underline text-xs">查看详情</span>
-                        </td>
-                    </tr>
+                // Slide HTML
+                slidesHtml += `
+                    <div class="banner-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${activeClass}" data-index="${index}">
+                        <a href="news-detail.html?id=${item.id}" class="block w-full h-full cursor-pointer">
+                            <img src="${imgUrl}" class="w-full h-full object-cover" alt="${item.title}">
+                            <!-- 底部文字渐变遮罩 -->
+                            <div class="absolute bottom-0 w-full bg-gradient-to-t from-[#004098]/90 via-[#004098]/60 to-transparent pt-24 pb-8 px-8">
+                                <h2 class="text-xl md:text-3xl font-bold text-white mb-3 tracking-wide drop-shadow-lg line-clamp-2">
+                                    ${item.title}
+                                </h2>
+                            </div>
+                        </a>
+                    </div>
+                `;
+
+                // Dot HTML
+                const dotActive = index === 0 ? 'bg-white w-8' : 'bg-white/40 w-8 hover:bg-white';
+                dotsHtml += `<span class="h-1 rounded-sm shadow-sm cursor-pointer transition-all duration-300 ${dotActive}" data-index="${index}"></span>`;
+            });
+
+            track.innerHTML = slidesHtml;
+            dotsContainer.innerHTML = dotsHtml;
+
+            // 绑定事件
+            setupBannerEvents(articles.length);
+        }
+
+        function setupBannerEvents(count) {
+            let currentIndex = 0;
+            const slides = document.querySelectorAll('.banner-slide');
+            const dots = document.querySelectorAll('#banner-dots span');
+            
+            const showSlide = (index) => {
+                // 处理索引越界
+                if (index >= count) index = 0;
+                if (index < 0) index = count - 1;
+                currentIndex = index;
+
+                // 切换 Slide
+                slides.forEach(slide => {
+                    slide.classList.remove('opacity-100', 'z-10');
+                    slide.classList.add('opacity-0', 'z-0');
+                });
+                slides[currentIndex].classList.remove('opacity-0', 'z-0');
+                slides[currentIndex].classList.add('opacity-100', 'z-10');
+
+                // 切换 Dots
+                dots.forEach(dot => {
+                    dot.className = 'bg-white/40 w-8 h-1 rounded-sm shadow-sm cursor-pointer transition-all duration-300 hover:bg-white';
+                });
+                dots[currentIndex].className = 'bg-white w-8 h-1 rounded-sm shadow-sm cursor-pointer transition-all duration-300';
+            };
+
+            // 自动轮播
+            const startAutoPlay = () => {
+                stopAutoPlay();
+                bannerInterval = setInterval(() => {
+                    showSlide(currentIndex + 1);
+                }, 5000); // 5秒切换
+            };
+
+            const stopAutoPlay = () => {
+                if (bannerInterval) clearInterval(bannerInterval);
+            };
+
+            // 按钮点击
+            document.getElementById('banner-prev').addEventListener('click', () => {
+                stopAutoPlay();
+                showSlide(currentIndex - 1);
+                startAutoPlay();
+            });
+            document.getElementById('banner-next').addEventListener('click', () => {
+                stopAutoPlay();
+                showSlide(currentIndex + 1);
+                startAutoPlay();
+            });
+
+            // Dots 点击
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => {
+                    stopAutoPlay();
+                    showSlide(idx);
+                    startAutoPlay();
+                });
+            });
+
+            // 启动
+            startAutoPlay();
+        }
+
+        // === 下方列表渲染逻辑 (与之前类似) ===
+        function renderNewsSection(data) {
+            const headlineContainer = document.getElementById('news-headline-container');
+            const listContainer = document.getElementById('news-list-container');
+            
+            if (!data || data.length === 0) {
+                headlineContainer.innerHTML = '<p class="text-gray-400 text-sm">暂无新闻</p>';
+                return;
+            }
+
+            // 1. 列表头条 (取第一条，或者取非轮播的第一条)
+            // 这里我们简单取数据中的第一条作为“列表区的头条”
+            const headline = data[0]; 
+            const coverImg = headline.image_url || 'https://images.unsplash.com/photo-1544531696-609805d76d65?q=80&w=2072';
+            const dateStr = new Date(headline.created_at).toISOString().split('T')[0];
+
+            headlineContainer.innerHTML = `
+                <a href="news-detail.html?id=${headline.id}" class="flex flex-col sm:flex-row gap-6 mb-8 cursor-pointer group block">
+                    <div class="w-full sm:w-72 h-44 overflow-hidden rounded-sm shrink-0 shadow-sm relative">
+                        <img src="${coverImg}" class="w-full h-full object-cover transform transition duration-500 group-hover:scale-105" alt="新闻图">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-1">
+                        <div>
+                            <h3 class="text-lg font-bold text-[#333] mb-3 group-hover:text-[#004098] transition leading-snug">
+                                ${headline.title}
+                            </h3>
+                            <p class="text-sm text-[#666] leading-relaxed line-clamp-2 md:line-clamp-3">
+                                ${headline.summary || '暂无摘要'}
+                            </p>
+                        </div>
+                        <span class="text-xs text-gray-400 mt-2 font-mono flex items-center">
+                            <i class="fa-regular fa-calendar-check mr-2 text-[#004098]/60"></i> ${dateStr}
+                        </span>
+                    </div>
+                </a>
+            `;
+
+            // 2. 列表 (排除刚才展示的那一条)
+            const listItems = data.slice(1, 5); // 取接下来的4条
+            let listHtml = '';
+            listItems.forEach(item => {
+                const itemDate = new Date(item.created_at).toISOString().split('T')[0];
+                listHtml += `
+                    <li class="border-b border-dashed border-gray-100 pb-3 last:border-0 hover:translate-x-1 transition-all duration-300">
+                        <a href="news-detail.html?id=${item.id}" class="flex items-center justify-between group cursor-pointer w-full">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <i class="fa-solid fa-caret-right text-gray-300 group-hover:text-[#004098] text-xs"></i>
+                                <span class="text-[#333] truncate group-hover:text-[#004098] text-sm md:text-base font-medium">
+                                    ${item.title}
+                                </span>
+                            </div>
+                            <span class="text-gray-400 text-sm shrink-0 font-mono">${itemDate}</span>
+                        </a>
+                    </li>
                 `;
             });
-            tbody.innerHTML = html;
+            listContainer.innerHTML = listHtml;
         }
-        
-        function updatePagination(count) {
-            totalCount = count;
-            const totalPages = Math.ceil(count / pageSize);
-            
-            // 更新分页按钮状态
-            const prevBtn = document.getElementById('prevPage');
-            const nextBtn = document.getElementById('nextPage');
-            
-            if (currentPage <= 1) {
-                prevBtn.disabled = true;
-                prevBtn.classList.add('cursor-not-allowed', 'text-gray-400');
-            } else {
-                prevBtn.disabled = false;
-                prevBtn.classList.remove('cursor-not-allowed', 'text-gray-400');
-                prevBtn.classList.add('cursor-pointer', 'hover:bg-gray-50');
-            }
-            
-            if (currentPage >= totalPages) {
-                nextBtn.disabled = true;
-                nextBtn.classList.add('cursor-not-allowed', 'text-gray-400');
-            } else {
-                nextBtn.disabled = false;
-                nextBtn.classList.remove('cursor-not-allowed', 'text-gray-400');
-                nextBtn.classList.add('cursor-pointer', 'hover:bg-gray-50');
-            }
-            
-            // 更新页码显示
-            const page1Btn = document.getElementById('page1');
-            if (totalPages === 0) {
-                page1Btn.innerText = '0';
-                page1Btn.classList.remove('bg-[#004098]', 'text-white');
-                page1Btn.classList.add('bg-gray-100', 'text-gray-400');
-            } else {
-                page1Btn.innerText = currentPage;
-                page1Btn.classList.add('bg-[#004098]', 'text-white');
-                page1Btn.classList.remove('bg-gray-100', 'text-gray-400');
-            }
-        }
-        
-        function filterStandards(type) {
-            // 更新选项卡样式
-            document.querySelectorAll('.std-tab').forEach(btn => {
-                btn.className = 'std-tab px-6 py-2 text-sm text-gray-600 border-b-2 border-transparent hover:text-[#004098] hover:bg-gray-50 transition whitespace-nowrap';
+
+        function renderNoticeSection(data) {
+            const container = document.getElementById('notice-list-container');
+            if (!data || data.length === 0) return;
+
+            let html = '';
+            data.forEach(item => {
+                const dateObj = new Date(item.created_at);
+                const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+                const day = dateObj.getDate().toString().padStart(2, '0');
+                const dateDisplay = `${month}-${day}`;
+                const year = dateObj.getFullYear();
+
+                html += `
+                    <div class="flex gap-4 group cursor-pointer" onclick="window.location.href='news-detail.html?id=${item.id}'">
+                        <div class="w-14 h-14 bg-blue-50 text-[#004098] border border-blue-100 flex flex-col items-center justify-center rounded-sm shrink-0 group-hover:bg-[#004098] group-hover:text-white transition shadow-sm">
+                            <span class="text-xs scale-90 opacity-80">${year}</span>
+                            <span class="text-lg font-bold leading-none font-mono">${dateDisplay}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-[#333] group-hover:text-[#004098] leading-snug line-clamp-2 font-medium mt-1 transition">
+                                ${item.title}
+                            </p>
+                        </div>
+                    </div>
+                `;
             });
-            event.target.className = 'std-tab px-6 py-2 text-sm font-bold text-[#004098] border-b-2 border-[#004098] hover:bg-gray-50 transition whitespace-nowrap';
-            
-            // 更新过滤条件
-            currentType = type;
-            currentPage = 1;
-            
-            loadAndFilterStandards();
+            container.innerHTML = html;
         }
-        
-        function showLoading() {
-            const tbody = document.getElementById('standards-table-body');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center py-10 text-gray-400">
-                        <i class="fa-solid fa-spinner fa-spin mr-2"></i> 正在加载数据...
-                    </td>
-                </tr>
-            `;
-        }
-        
-        function showError(message) {
-            const tbody = document.getElementById('standards-table-body');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center py-10 text-red-500">
-                        <i class="fa-solid fa-exclamation-triangle mr-2"></i> ${message}
-                    </td>
-                </tr>
-            `;
-        }
-        
-        function formatDate(dateString) {
-            try {
-                const date = new Date(dateString);
-                return date.toISOString().split('T')[0];
-            } catch (e) {
-                return dateString;
-            }
+
+        function showError(msg) {
+            document.getElementById('error-alert').classList.remove('hidden');
+            document.getElementById('error-msg').innerHTML = msg;
         }
     </script>
     <!-- 引入 API (如果之前没引) 和 Search 逻辑 -->
