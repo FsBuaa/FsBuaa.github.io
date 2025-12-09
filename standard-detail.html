@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标准详情 - 国家市场监督管理总局技术创新中心</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tech-blue': '#004098',   
+                        'tech-dark': '#003380',
+                        'text-main': '#333333',
+                    },
+                    fontFamily: {
+                        'slogan': ['STKaiti', 'KaiTi', '楷体', 'FangSong', 'SimSun', 'serif'], 
+                        'sans': ['Microsoft YaHei', 'PingFang SC', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; }
+        
+        /* --- 头部科技感背景 (与 Index 保持一致) --- */
+        .header-tech-bg {
+            background-color: #001540;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                linear-gradient(to right, #001540, #003380, #001540);
+            position: relative;
+        }
+        .header-tech-bg::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px; pointer-events: none;
+        }
+
+        /* 导航栏特效 */
+        .nav-item { position: relative; }
+        .nav-item::after {
+            content: ''; position: absolute; bottom: 8px; left: 50%; width: 0%; height: 2px;
+            background-color: #fff; transform: translateX(-50%); transition: width 0.3s ease;
+        }
+        .nav-item:hover::after { width: 60%; }
+        
+        /* 下拉菜单动画 */
+        .group:hover .group-hover\:block { display: block; animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 状态颜色 */
+        .badge-active { background: #dcfce7; color: #166534; }
+        .badge-draft { background: #fef9c3; color: #854d0e; }
+        .badge-upcoming { background: #dbeafe; color: #1e40af; }
+    </style>
+</head>
+<body class="bg-gray-50 text-[#333] flex flex-col min-h-screen">
+
+    <!-- ================= 1. 顶部 Header (与 Index 完全一致) ================= -->
+    <div class="w-full text-white pb-0 header-tech-bg">
+        <header class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-7 relative z-10">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+                <!-- 左侧：Logo + 标题 -->
+                <div class="flex items-center gap-5 self-start lg:self-center">
+                    <div class="w-16 h-16 shrink-0 flex items-center justify-center">
+                        <img src="figure/nevsc_logo.png" alt="Logo" class="w-full h-full object-contain drop-shadow-md" 
+                             onerror="this.parentElement.innerHTML='<div class=\'text-white font-bold border border-white/30 p-2 rounded\'>LOGO</div>'">
+                    </div>
+                    <div class="flex flex-col justify-center gap-1">
+                        <h1 class="text-sm md:text-lg text-blue-100 font-bold tracking-wide opacity-90 text-justify">
+                            国家市场监督管理总局技术创新中心
+                        </h1>
+                        <h2 class="text-sm md:text-lg text-blue-100 font-medium tracking-wide opacity-90 text-justify">
+                            (新能源汽车数字监管技术及应用)
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- 右侧：搜索 -->
+                <div class="flex flex-col items-end gap-2 w-full lg:w-auto mt-4 lg:mt-0">
+                    <div class="relative w-full md:w-64 group"> <!-- 稍微调宽了一点到 w-64 -->
+                        
+                        <!-- 1. Input: 添加 autocomplete="off" -->
+                        <input type="text" id="global-search-input" placeholder="输入关键词..." autocomplete="off"
+                            class="w-full bg-white/10 border border-white/20 text-white text-sm rounded-full pl-4 pr-10 py-1.5 
+                                    focus:outline-none focus:bg-white/15 focus:border-blue-300 transition shadow-inner backdrop-blur-sm">
+                        
+                        <!-- 2. Button: 保持不变 -->
+                        <button id="global-search-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition">
+                            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                        </button>
+
+                        <!-- 3. 【新增】下拉结果容器 -->
+                        <!-- 使用 absolute 定位，z-50 保证在最上层，默认 hidden -->
+                        <div id="search-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden z-50">
+                            <!-- JS 将会在这里动态插入内容 -->
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 导航栏 -->
+        <nav class="border-t border-white/10 mt-2 relative z-10" style="background-color: rgba(255, 255, 255, 0.05);"> 
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-wrap justify-center space-x-2">
+                    <a href="index.html" class="nav-item text-blue-100 hover:text-white px-8 py-4 text-base tracking-widest transition relative">首页</a>
+                    <a href="about.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">中心概况</a>
+                    <a href="news.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
+                    <a href="activity.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">行业活动</a>
+                    <!-- 当前页高亮 -->
+                    <a href="standards.html" class="text-white font-bold px-6 py-4 font-medium transition text-base tracking-wide relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-white">标准研制</a>
+                    <a href="research.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">技术研究</a>
+                    <div class="relative group h-full">
+                        <button class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition flex items-center h-full text-base tracking-wide">
+                            更多 <i class="fa-solid fa-angle-down ml-2 text-xs opacity-70"></i>
+                        </button>
+                        <div class="absolute left-0 top-full w-36 bg-white shadow-xl rounded-b-md hidden group-hover:block z-50">
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098] border-b border-gray-50">党建风采</a>
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098] border-b border-gray-50">人才招聘</a>
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098]">联系我们</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- ================= 2. 面包屑导航 ================= -->
+    <div class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="text-sm text-gray-500 flex items-center">
+                <a href="index.html" class="hover:text-[#004098] transition"><i class="fa-solid fa-house mr-1"></i> 首页</a>
+                <span class="mx-2 text-gray-300">/</span>
+                <a href="standards.html" class="hover:text-[#004098] transition">标准研制</a>
+                <span class="mx-2 text-gray-300">/</span>
+                <span class="text-gray-800 font-medium">详情</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 3. 详情主体 ================= -->
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
+        <div class="bg-white rounded shadow-sm border border-gray-100 p-8 md:p-12">
+            
+            <!-- 头部基本信息 -->
+            <div class="border-b border-gray-100 pb-8 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                    <h1 class="text-2xl md:text-3xl font-bold text-[#004098] mb-2 md:mb-0" id="std-code">加载中...</h1>
+                    <span id="std-status" class="px-3 py-1 rounded text-sm font-bold">...</span>
+                </div>
+                <h2 class="text-xl font-medium text-[#333] mb-6" id="std-title">...</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-600 bg-gray-50 p-4 rounded">
+                    <div><span class="font-bold text-gray-800">发布日期：</span> <span id="std-publish-date">-</span></div>
+                    <div><span class="font-bold text-gray-800">实施日期：</span> <span id="std-implement-date">-</span></div>
+                    <div><span class="font-bold text-gray-800">主管部门：</span> <span id="std-dept">国家标准化管理委员会</span></div>
+                </div>
+            </div>
+
+            <!-- 详细内容与操作 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                
+                <!-- 左侧：内容摘要与预览 -->
+                <div class="lg:col-span-2 space-y-8">
+                    <div>
+                        <h3 class="font-bold text-[#333] border-l-4 border-[#004098] pl-3 mb-4">适用范围</h3>
+                        <p class="text-gray-600 leading-relaxed text-justify text-sm">
+                            本标准规定了新能源汽车数字监管相关的数据采集、传输、存储及处理规范。适用于各类新能源汽车生产企业及相关监管机构。本标准涵盖了车辆运行数据、故障报警数据以及电池安全数据的监控要求。
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-bold text-[#333] border-l-4 border-[#004098] pl-3 mb-4">在线预览</h3>
+                        <div class="w-full h-96 bg-gray-100 border border-gray-200 rounded flex flex-col items-center justify-center text-gray-400">
+                            <i class="fa-regular fa-file-pdf text-5xl mb-4"></i>
+                            <p>PDF 文档预览区域</p>
+                            <p class="text-xs mt-2">( 实际开发中可嵌入 PDF.js )</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：下载与反馈 -->
+                <div class="lg:col-span-1">
+                    <div class="bg-blue-50 p-6 rounded border border-blue-100 mb-6">
+                        <h3 class="font-bold text-[#004098] mb-4">获取标准</h3>
+                        <button class="w-full bg-[#004098] text-white py-3 rounded font-bold hover:bg-[#003380] transition mb-3 flex items-center justify-center">
+                            <i class="fa-solid fa-download mr-2"></i> 下载全文 (PDF)
+                        </button>
+                        <p class="text-xs text-gray-500 text-center">文件大小: 2.4 MB</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded border border-gray-200">
+                        <h3 class="font-bold text-gray-800 mb-4">意见反馈</h3>
+                        <p class="text-sm text-gray-500 mb-4">如果您对本标准有任何建议或发现错误，请通过下方入口提交。</p>
+                        <button class="w-full border border-gray-300 text-gray-600 py-2 rounded hover:bg-gray-50 transition">
+                            <i class="fa-regular fa-comment-dots mr-2"></i> 提交反馈
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= 4. 页脚 (与 Index 完全一致) ================= -->
+    <footer class="bg-[#1e293b] text-gray-400 pt-12 pb-8 mt-auto border-t-4 border-[#004098]">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+                <!-- 友情链接 -->
+                <div class="col-span-1 md:col-span-2">
+                    <h4 class="text-white font-bold text-lg mb-5 border-l-4 border-[#004098] pl-3">相关部门链接</h4>
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                        <a href="https://www.samr.gov.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局
+                        </a>
+                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>总局召回中心
+                        </a>
+                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国中检 (CCIC)
+                        </a>
+                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中检汽研
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 联系方式 -->
+                <div class="col-span-1 md:col-span-1">
+                    <h4 class="text-white font-bold text-lg mb-5 border-l-4 border-[#004098] pl-3">联系我们</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start"><i class="fa-solid fa-location-dot mt-1 mr-1 text-gray-500"></i> 地址：北京市朝阳区西坝河东里18号中检大厦</li>
+                        <li class="flex items-center"><i class="fa-solid fa-envelope mr-3 text-gray-500"></i> 邮箱：nevsc@caeri.com.cn</li>
+                        <li class="flex items-center"><i class="fa-solid fa-phone mr-3 text-gray-500"></i> 电话：010-88888888</li>
+                    </ul>
+                </div>
+
+                <!-- 公众号二维码 -->
+                <div class="col-span-1 md:col-span-1 flex flex-col items-center md:items-start">
+                    <h4 class="text-white font-bold text-lg mb-5">关注我们</h4>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-white p-1.5 rounded-lg shadow-lg">
+                            <img src="figure/QRcode.jpg" alt="微信公众号" class="w-20 h-20">
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <p class="mb-1 text-white font-bold">官方微信</p>
+                            <p>扫一扫了解更多</p>
+                            <p>行业动态</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 版权线 -->
+            <div class="border-t border-gray-700 pt-8 text-center text-xs text-gray-500 font-medium">
+                <p>&copy; 2025 国家市场监督管理总局技术创新中心（新能源汽车数字监管技术及应用） 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 逻辑脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取 URL 参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            // 模拟数据库 (与 standards.html 保持一致，增加了地方标准)
+            const db = [
+                { id: 1, code: 'GB/T 32960-2016', title: '电动汽车远程服务与管理系统技术规范', status: 'active', pDate: '2016-01-01', iDate: '2016-04-01', dept: '国家标准化管理委员会' },
+                { id: 2, code: 'GB 18384-2020', title: '电动汽车安全要求', status: 'active', pDate: '2020-05-12', iDate: '2021-01-01', dept: '国家标准化管理委员会' },
+                { id: 3, code: 'QC/T 897-2011', title: '电动汽车用电池管理系统技术条件', status: 'active', pDate: '2011-12-01', iDate: '2012-06-01', dept: '工业和信息化部' },
+                { id: 4, code: 'T/CSAE 156-2020', title: '电动汽车事故深度调查规范', status: 'draft', pDate: '-', iDate: '-', dept: '中国汽车工程学会' },
+                { id: 5, code: 'GB 38031-2020', title: '电动汽车用动力蓄电池安全要求', status: 'active', pDate: '2020-05-12', iDate: '2021-01-01', dept: '国家标准化管理委员会' },
+                { id: 6, code: 'T/NEV 001-2024', title: '新能源汽车数字监管平台数据接入规范', status: 'upcoming', pDate: '2024-12-01', iDate: '2025-01-01', dept: '技术创新中心' },
+                // 新增地方标准
+                { id: 7, code: 'DB50/T 888-2024', title: '重庆市新能源汽车运行安全大数据监测平台技术规范', status: 'active', pDate: '2024-05-01', iDate: '2024-06-01', dept: '重庆市市场监督管理局' },
+            ];
+
+            const item = db.find(i => i.id == id);
+
+            if(item) {
+                document.title = `${item.code} 详情 - 技术创新中心`;
+                document.getElementById('std-code').innerText = item.code;
+                document.getElementById('std-title').innerText = item.title;
+                document.getElementById('std-publish-date').innerText = item.pDate;
+                document.getElementById('std-implement-date').innerText = item.iDate;
+                document.getElementById('std-dept').innerText = item.dept || '相关主管部门';
+
+                const statusBadge = document.getElementById('std-status');
+                if(item.status === 'active') {
+                    statusBadge.innerText = '现行';
+                    statusBadge.className = 'px-3 py-1 rounded text-sm font-bold badge-active';
+                } else if(item.status === 'draft') {
+                    statusBadge.innerText = '征求意见';
+                    statusBadge.className = 'px-3 py-1 rounded text-sm font-bold badge-draft';
+                } else {
+                    statusBadge.innerText = '即将实施';
+                    statusBadge.className = 'px-3 py-1 rounded text-sm font-bold badge-upcoming';
+                }
+            } else {
+                document.querySelector('main').innerHTML = '<div class="text-center py-20 text-gray-500">未找到该标准信息</div>';
+            }
+        });
+    </script>
+    <!-- 引入 API (如果之前没引) 和 Search 逻辑 -->
+    <script type="module" src="js/search.js"></script>
+</body>
+</html>

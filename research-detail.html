@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课题详情 - 国家市场监督管理总局技术创新中心</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tech-blue': '#004098',   
+                        'tech-dark': '#003380',
+                        'text-main': '#333333',
+                    },
+                    fontFamily: { 'sans': ['Microsoft YaHei', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; }
+        .header-tech-bg {
+            background-color: #001540;
+            background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), linear-gradient(to right, #001540, #003380, #001540);
+            position: relative;
+        }
+        .header-tech-bg::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px; pointer-events: none;
+        }
+        .nav-item::after { content: ''; position: absolute; bottom: 8px; left: 50%; width: 0%; height: 2px; background-color: #fff; transform: translateX(-50%); transition: width 0.3s ease; }
+        .nav-item:hover::after { width: 60%; }
+        .detail-content p { margin-bottom: 1.5rem; line-height: 1.8; text-align: justify; }
+    </style>
+</head>
+<body class="bg-gray-50 text-[#333] flex flex-col min-h-screen">
+
+    <!-- Header (Copy from index.html for consistency) -->
+    <div class="w-full text-white pb-0 header-tech-bg">
+        <header class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-7 relative z-10">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-5 self-start lg:self-center">
+                    <div class="w-16 h-16 shrink-0 flex items-center justify-center">
+                        <img src="figure/nevsc_logo.png" alt="Logo" class="w-full h-full object-contain drop-shadow-md" onerror="this.parentElement.innerHTML='LOGO'">
+                    </div>
+                    <div class="flex flex-col justify-center gap-1">
+                        <h1 class="text-sm md:text-lg text-blue-100 font-bold tracking-wide opacity-90 text-justify">国家市场监督管理总局技术创新中心</h1>
+                        <h2 class="text-sm md:text-lg text-blue-100 font-medium tracking-wide opacity-90 text-justify">(新能源汽车数字监管技术及应用)</h2>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <nav class="border-t border-white/10 mt-2 relative z-10" style="background-color: rgba(255, 255, 255, 0.05);"> 
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-wrap justify-center space-x-2">
+                    <a href="index.html" class="nav-item text-blue-100 hover:text-white px-8 py-4 text-base tracking-widest transition relative">首页</a>
+                    <a href="about.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">中心概况</a>
+                    <a href="news.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
+                    <a href="activity.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">行业活动</a>
+                    <a href="standards.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">标准研制</a>
+                    <a href="research.html" class="text-white font-bold px-6 py-4 font-medium transition text-base tracking-wide relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-white">技术研究</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="text-sm text-gray-500 flex items-center">
+                <a href="index.html" class="hover:text-[#004098] transition"><i class="fa-solid fa-house mr-1"></i> 首页</a>
+                <span class="mx-2 text-gray-300">/</span>
+                <a href="research.html" class="hover:text-[#004098] transition">技术研究</a>
+                <span class="mx-2 text-gray-300">/</span>
+                <span class="text-gray-800 font-medium">课题详情</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
+        <div class="bg-white rounded shadow-sm border border-gray-100 p-8 md:p-12">
+            <!-- Loading State -->
+            <div id="loading" class="text-center py-20">
+                <i class="fa-solid fa-spinner fa-spin text-4xl text-[#004098] mb-4"></i>
+                <p class="text-gray-500">正在加载课题详情...</p>
+            </div>
+
+            <!-- Content Container (Hidden initially) -->
+            <div id="content-area" class="hidden">
+                <div class="border-b border-gray-200 pb-6 mb-8 text-center">
+                    <span id="proj-type" class="bg-[#004098] text-white px-3 py-1 rounded text-xs font-bold mb-4 inline-block tracking-wide">类别</span>
+                    <h1 id="proj-name" class="text-2xl md:text-3xl font-bold text-[#333] mb-4 leading-snug">课题名称</h1>
+                    <div class="flex justify-center gap-8 text-sm text-gray-600 bg-gray-50 py-3 rounded inline-block px-10">
+                        <span><i class="fa-solid fa-flag mr-2 text-[#004098]"></i> 阶段：<span id="proj-stage" class="font-bold"></span></span>
+                        <span><i class="fa-solid fa-user-tag mr-2 text-[#004098]"></i> 角色：<span id="proj-role" class="font-bold"></span></span>
+                    </div>
+                </div>
+
+                <div class="max-w-4xl mx-auto detail-content text-lg text-gray-700">
+                    <div class="mb-10">
+                        <h3 class="font-bold text-[#004098] text-xl mb-4 border-l-4 border-[#004098] pl-3">主要研究内容</h3>
+                        <div id="proj-content" class="leading-relaxed text-justify"></div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 pt-8 mt-12 text-center">
+                    <button onclick="history.back()" class="inline-flex items-center justify-center px-8 py-2.5 border border-gray-300 rounded text-gray-600 hover:bg-[#004098] hover:text-white transition font-medium">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> 返回列表
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#1e293b] text-gray-400 pt-12 pb-8 mt-auto border-t-4 border-[#004098]">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 国家市场监督管理总局技术创新中心（新能源汽车数字监管技术及应用） 版权所有</p>
+        </div>
+    </footer>
+
+    <!-- Logic -->
+    <script type="module">
+        import { getItemById } from './js/api.js';
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            if (!id) {
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">参数错误：未找到课题ID</p>';
+                return;
+            }
+
+            try {
+                const item = await getItemById('projects', id);
+                if (item) {
+                    document.title = `${item.name} - 详情`;
+                    document.getElementById('proj-type').innerText = item.type || '未分类';
+                    document.getElementById('proj-name').innerText = item.name;
+                    document.getElementById('proj-stage').innerText = item.stage || '-';
+                    document.getElementById('proj-role').innerText = item.role || '-';
+                    document.getElementById('proj-content').innerText = item.content || '无详细内容';
+                    
+                    // Show content, hide loading
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('content-area').classList.remove('hidden');
+                } else {
+                    document.getElementById('loading').innerHTML = '<p class="text-gray-500">未找到该课题信息</p>';
+                }
+            } catch (error) {
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">数据加载失败</p>';
+            }
+        });
+    </script>
+</body>
+</html>

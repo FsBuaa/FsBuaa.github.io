@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动详情 - 国家市场监督管理总局技术创新中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 'tech-blue': '#004098', 'tech-dark': '#003380' },
+                    fontFamily: { 'sans': ['Microsoft YaHei', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; }
+        .header-tech-bg {
+            background-color: #001540;
+            background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), linear-gradient(to right, #001540, #003380, #001540);
+        }
+        .header-tech-bg::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px; pointer-events: none;
+        }
+        .nav-item::after { content: ''; position: absolute; bottom: 8px; left: 50%; width: 0%; height: 2px; background-color: #fff; transform: translateX(-50%); transition: width 0.3s ease; }
+        .nav-item:hover::after { width: 60%; }
+        /* 详情页专用 */
+        .rich-text p { margin-bottom: 1rem; line-height: 1.8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-[#333] flex flex-col min-h-screen">
+
+    <!-- Header (与 Index 保持一致) -->
+    <div class="w-full text-white pb-0 header-tech-bg">
+        <header class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-7 relative z-10">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-5 self-start lg:self-center">
+                    <div class="w-16 h-16 shrink-0 flex items-center justify-center">
+                        <img src="figure/nevsc_logo.png" alt="Logo" class="w-full h-full object-contain drop-shadow-md" onerror="this.parentElement.innerHTML='LOG'">
+                    </div>
+                    <div class="flex flex-col justify-center gap-1">
+                        <h1 class="text-sm md:text-lg text-blue-100 font-bold tracking-wide opacity-90 text-justify">国家市场监督管理总局技术创新中心</h1>
+                        <h2 class="text-sm md:text-lg text-blue-100 font-medium tracking-wide opacity-90 text-justify">(新能源汽车数字监管技术及应用)</h2>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <nav class="border-t border-white/10 mt-2 relative z-10" style="background-color: rgba(255, 255, 255, 0.05);"> 
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-wrap justify-center space-x-2">
+                    <a href="index.html" class="nav-item text-blue-100 hover:text-white px-8 py-4 text-base tracking-widest transition relative">首页</a>
+                    <a href="about.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">中心概况</a>
+                    <a href="news.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
+                    <a href="activity.html" class="text-white font-bold px-6 py-4 font-medium transition text-base tracking-wide relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-white">行业活动</a>
+                    <a href="standards.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">标准研制</a>
+                    <a href="research.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">技术研究</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 面包屑 -->
+    <div class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="text-sm text-gray-500 flex items-center">
+                <a href="index.html" class="hover:text-[#004098] transition"><i class="fa-solid fa-house mr-1"></i> 首页</a>
+                <span class="mx-2 text-gray-300">/</span>
+                <a href="activity.html" class="hover:text-[#004098] transition">行业活动</a>
+                <span class="mx-2 text-gray-300">/</span>
+                <span class="text-gray-800 font-medium">活动回顾</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体内容 -->
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
+        <div class="bg-white rounded shadow-sm border border-gray-100 overflow-hidden">
+            
+            <!-- 头部大图与标题 -->
+            <div class="relative w-full h-[400px]">
+                <img id="detail-banner" src="" class="w-full h-full object-cover" alt="Banner">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+                    <div class="p-8 md:p-12 w-full text-white">
+                        <span id="detail-tag" class="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded uppercase mb-3 inline-block">回顾</span>
+                        <h1 id="detail-title" class="text-3xl md:text-4xl font-bold mb-4">标题加载中...</h1>
+                        <div class="flex items-center text-sm text-gray-300">
+                            <span class="mr-6"><i class="fa-regular fa-calendar mr-2"></i> <span id="detail-date">-</span></span>
+                            <span><i class="fa-solid fa-location-dot mr-2"></i> <span id="detail-location">-</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <!-- 左侧：主要内容 -->
+                <div class="lg:col-span-2">
+                    
+                    <!-- 视频回顾区域 -->
+                    <div class="mb-10">
+                        <h3 class="text-xl font-bold text-[#004098] border-l-4 border-[#004098] pl-3 mb-6">赛事精彩视频</h3>
+                        <div class="aspect-video bg-black rounded-lg overflow-hidden shadow-lg relative group">
+                            <!-- 模拟视频播放器 (这里放一个封面，实际开发可换 iframe 或 video 标签) -->
+                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070" class="w-full h-full object-cover opacity-80" alt="Video Cover">
+                            <button class="absolute inset-0 flex items-center justify-center text-white group-hover:scale-110 transition">
+                                <i class="fa-regular fa-circle-play text-6xl drop-shadow-lg"></i>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2 text-center">点击播放决赛现场精彩集锦</p>
+                    </div>
+
+                    <!-- 详细介绍 (长文) -->
+                    <div class="rich-text text-gray-700 text-lg mb-10">
+                        <h3 class="text-xl font-bold text-[#004098] border-l-4 border-[#004098] pl-3 mb-4">活动详情</h3>
+                        <div id="detail-content">
+                            <!-- JS 填充内容 -->
+                        </div>
+                    </div>
+
+                    <!-- 精彩图集 -->
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004098] border-l-4 border-[#004098] pl-3 mb-6">精彩瞬间</h3>
+                        <div class="grid grid-cols-2 gap-4" id="detail-gallery">
+                            <!-- JS 填充图片 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：获奖名单 -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-50 p-6 rounded border border-gray-200 sticky top-24">
+                        <h3 class="text-lg font-bold text-[#333] mb-4 text-center">🏆 最终获奖名单</h3>
+                        <div class="space-y-4" id="detail-winners">
+                            <!-- JS 填充名单 -->
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h4 class="font-bold text-sm text-gray-500 mb-2">主办单位</h4>
+                            <p class="text-sm text-[#333] mb-4">国家市场监督管理总局技术创新中心</p>
+                            <h4 class="font-bold text-sm text-gray-500 mb-2">承办单位</h4>
+                            <p class="text-sm text-[#333]">中国汽车工程研究院股份有限公司</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (与 Index 保持一致) -->
+    <footer class="bg-[#1e293b] text-gray-400 pt-12 pb-8 mt-auto border-t-4 border-[#004098]">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 国家市场监督管理总局技术创新中心（新能源汽车数字监管技术及应用） 版权所有</p>
+        </div>
+    </footer>
+
+    <!-- 模拟数据脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            // 模拟数据源 (实际开发中这里可以请求数据库)
+            const data = {
+                '2023': {
+                    title: '2023 首届动力电池安全预警算法大赛',
+                    date: '2023年11月 - 2024年1月',
+                    location: '中国 · 北京',
+                    banner: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070',
+                    content: `
+                        <p>2023年11月，由技术创新中心主办的首届“动力电池安全预警算法大赛”在北京圆满落幕。本次大赛旨在解决新能源汽车行业面临的“电池热失控预警难、误报率高”的共性技术难题。</p>
+                        <p>大赛历时3个月，共吸引了来自清华大学、北京理工大学、上海交通大学等高校及科研机构的150余支队伍报名参赛。参赛团队基于中心提供的海量脱敏实车运行数据，开发了多种创新性的预警算法模型。</p>
+                        <p>经过初赛、复赛和决赛答辩的激烈角逐，最终评选出一等奖1名、二等奖2名、三等奖3名。获奖算法在实车验证中，将热失控预警时间平均提前了24小时以上，准确率达到96.5%。</p>
+                    `,
+                    winners: [
+                        { rank: '金奖', name: '北京理工大学 - 深蓝护卫队', desc: '创新性提出多模态融合预警模型' },
+                        { rank: '银奖', name: '清华大学 - 清能一号', desc: '基于时序数据的异常检测算法' },
+                        { rank: '银奖', name: '同济大学 - 电池卫士', desc: '轻量化边缘计算预警方案' },
+                    ],
+                    gallery: [
+                        'https://images.unsplash.com/photo-1591115765373-5207764f72e7?q=80&w=2070',
+                        'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070',
+                        'https://images.unsplash.com/photo-1544531696-609805d76d65?q=80&w=2072',
+                        'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032'
+                    ]
+                },
+                '2024': {
+                    title: '2024 第二届算法大赛（产业升级赛）',
+                    date: '2024年10月 - 2025年1月',
+                    location: '中国 · 重庆',
+                    banner: 'https://images.unsplash.com/photo-1591115765373-5207764f72e7?q=80&w=2070',
+                    content: `
+                        <p>继首届大赛成功举办后，2024年第二届算法大赛在赛制和规模上进行了全面升级。本次大赛首次引入“企业组”，鼓励产学研深度融合，共同攻克“云端实时计算”与“车端边缘计算”协同的技术瓶颈。</p>
+                        <p>大赛共设置奖金池50万元，报名队伍突破200支。决赛在重庆隆重举行，现场邀请了10位行业顶级专家担任评委。</p>
+                        <p>本届金奖团队开发的“云-边协同自适应预警系统”，在保证高准确率的同时，极大地降低了计算资源消耗，具备极高的工程化应用价值。</p>
+                    `,
+                    winners: [
+                        { rank: '金奖', name: '清华大学 & 宁德时代联队', desc: '云边协同自适应预警系统' },
+                        { rank: '银奖', name: '比亚迪汽车工程研究院', desc: '全生命周期安全管理平台' },
+                        { rank: '银奖', name: '重庆大学 - 智行团队', desc: '基于大数据的故障预测模型' },
+                    ],
+                    gallery: [
+                        'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070',
+                        'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070',
+                        'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070',
+                        'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070'
+                    ]
+                }
+            };
+
+            // 渲染逻辑
+            const item = data[id];
+            if (item) {
+                document.getElementById('detail-title').innerText = item.title;
+                document.getElementById('detail-date').innerText = item.date;
+                document.getElementById('detail-location').innerText = item.location;
+                document.getElementById('detail-banner').src = item.banner;
+                document.getElementById('detail-content').innerHTML = item.content;
+
+                // 渲染图集
+                const galleryHtml = item.gallery.map(url => `
+                    <div class="h-32 overflow-hidden rounded shadow-sm hover:opacity-90 cursor-pointer">
+                        <img src="${url}" class="w-full h-full object-cover transform hover:scale-110 transition duration-500">
+                    </div>
+                `).join('');
+                document.getElementById('detail-gallery').innerHTML = galleryHtml;
+
+                // 渲染获奖名单
+                const winnersHtml = item.winners.map((w, index) => `
+                    <div class="bg-white p-3 rounded border ${index===0 ? 'border-yellow-200 bg-yellow-50' : 'border-gray-100'} shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold ${index===0 ? 'text-yellow-600' : 'text-gray-600'}">
+                                <i class="fa-solid fa-medal mr-1"></i> ${w.rank}
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-sm text-[#333] mb-1">${w.name}</h4>
+                        <p class="text-xs text-gray-500">${w.desc}</p>
+                    </div>
+                `).join('');
+                document.getElementById('detail-winners').innerHTML = winnersHtml;
+            } else {
+                document.querySelector('main').innerHTML = '<div class="text-center py-20 text-gray-500">未找到相关活动信息</div>';
+            }
+        });
+    </script>
+</body>
+</html>

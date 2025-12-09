@@ -4,341 +4,508 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>国家市场监督管理总局技术创新中心（新能源汽车数字监管技术及应用）</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        body {
-            font-family: 'Inter', 'system-ui', -apple-system, sans-serif;
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tech-blue': '#004098',   
+                        'tech-dark': '#003380',
+                        'text-main': '#333333',
+                    },
+                    fontFamily: {
+                        'slogan': ['STKaiti', 'KaiTi', '楷体', 'FangSong', 'SimSun', 'serif'], 
+                        'sans': ['Microsoft YaHei', 'PingFang SC', 'sans-serif'],
+                    }
+                }
+            }
         }
-        .hero-bg {
-            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1593941707882-a5bba14938c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2072&q=80');
-            background-size: cover;
-            background-position: center;
+    </script>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        /* 导航栏特效 */
+        .nav-item { position: relative; }
+        .nav-item::after {
+            content: ''; position: absolute; bottom: 8px; left: 50%; width: 0%; height: 2px;
+            background-color: #fff; transform: translateX(-50%); transition: width 0.3s ease;
+        }
+        .nav-item:hover::after { width: 60%; }
+        
+        /* 下拉菜单动画 */
+        .group:hover .group-hover\:block { display: block; animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 头部科技感背景纹理 --- */
+        .header-tech-bg {
+            background-color: #001540;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                linear-gradient(to right, #001540, #003380, #001540);
+            position: relative;
+        }
+        .header-tech-bg::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center gap-3">
-                        <!-- Placeholder Icon -->
-                        <!-- Logo Area -->
-                        <!-- 提示：您可以将下方的 src 链接替换为您自己的 logo 图片文件路径，例如 "images/logo.png" -->
-                        <img src="figure/nevsc_logo.png" alt="Center Logo" class="h-12 w-12 shadow-sm">
-                        <div>
-                            <h1 class="text-lg font-bold text-blue-900 leading-tight">国家市场监督管理总局技术创新中心</h1>
-                            <p class="text-base font-bold chinese-justify text-gray-500">（新能源汽车数字监管技术及应用）</p>
+<body class="bg-gray-50 text-[#333]">
+
+    <!-- ================= 1. 顶部 Header ================= -->
+    <div class="w-full text-white pb-0 header-tech-bg">
+        <header class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-7 relative z-10">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+                <!-- 左侧：Logo + 标题 -->
+                <div class="flex items-center gap-5 self-start lg:self-center">
+                    <div class="w-16 h-16 shrink-0 flex items-center justify-center">
+                        <img src="figure/nevsc_logo.png" alt="Logo" class="w-full h-full object-contain drop-shadow-md" 
+                             onerror="this.parentElement.innerHTML='<div class=\'text-white font-bold border border-white/30 p-2 rounded\'>LOGO</div>'">
+                    </div>
+                    <div class="flex flex-col justify-center gap-1">
+                        <h1 class="text-sm md:text-lg text-blue-100 font-bold tracking-wide opacity-90 text-justify">
+                            国家市场监督管理总局技术创新中心
+                        </h1>
+                        <h2 class="text-sm md:text-lg text-blue-100 font-medium tracking-wide opacity-90 text-justify">
+                            (新能源汽车数字监管技术及应用)
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- 右侧：搜索 -->
+                <div class="flex flex-col items-end gap-2 w-full lg:w-auto mt-4 lg:mt-0">
+                    <div class="relative w-full md:w-64 group"> <!-- 稍微调宽了一点到 w-64 -->
+                        
+                        <!-- 1. Input: 添加 autocomplete="off" -->
+                        <input type="text" id="global-search-input" placeholder="输入关键词..." autocomplete="off"
+                            class="w-full bg-white/10 border border-white/20 text-white text-sm rounded-full pl-4 pr-10 py-1.5 
+                                    focus:outline-none focus:bg-white/15 focus:border-blue-300 transition shadow-inner backdrop-blur-sm">
+                        
+                        <!-- 2. Button: 保持不变 -->
+                        <button id="global-search-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition">
+                            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                        </button>
+
+                        <!-- 3. 【新增】下拉结果容器 -->
+                        <!-- 使用 absolute 定位，z-50 保证在最上层，默认 hidden -->
+                        <div id="search-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden z-50">
+                            <!-- JS 将会在这里动态插入内容 -->
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= 2. 导航栏 ================= -->
+        <nav class="border-t border-white/10 mt-2 relative z-10" style="background-color: rgba(255, 255, 255, 0.05);"> 
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-wrap justify-center space-x-2">
+                    <a href="index.html" class="text-white font-bold px-8 py-4 text-base tracking-widest relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-white">首页</a>
+                    <a href="about.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">中心概况</a>
+                    <a href="news.html?category=news" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
+                    <a href="activity.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">行业活动</a>
+                    <a href="standards.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">标准研制</a>
+                    <a href="research.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">技术研究</a>
+                    <div class="relative group h-full">
+                        <button class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition flex items-center h-full text-base tracking-wide">
+                            更多 <i class="fa-solid fa-angle-down ml-2 text-xs opacity-70"></i>
+                        </button>
+                        <div class="absolute left-0 top-full w-36 bg-white shadow-xl rounded-b-md hidden group-hover:block z-50">
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098] border-b border-gray-50">党建风采</a>
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098] border-b border-gray-50">人才招聘</a>
+                            <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#004098]">联系我们</a>
                         </div>
                     </div>
                 </div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-blue-700 font-medium border-b-2 border-blue-700 pb-1">首页</a>
-                    <a href="#about" class="text-gray-600 hover:text-blue-700 transition">中心概况</a>
-                    <a href="#functions" class="text-gray-600 hover:text-blue-700 transition">职责职能</a>
-                    <a href="#activities" class="text-gray-600 hover:text-blue-700 transition">新闻活动</a>
-                    <a href="#standards" class="text-gray-600 hover:text-blue-700 transition">标准制定</a>
-                    <a href="#contact" class="text-gray-600 hover:text-blue-700 transition">联系我们</a>
-                </div>
-                <!-- Mobile menu button -->
-                <div class="flex items-center md:hidden">
-                    <button type="button" class="text-gray-500 hover:text-gray-600 focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                </div>
             </div>
-        </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-blue-700 bg-blue-50">首页</a>
-                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">中心概况</a>
-                <a href="#functions" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">职责职能</a>
-                <a href="#activities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">新闻活动</a>
-                <a href="#standards" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">标准制定</a>
-                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">联系我们</a>
-            </div>
-        </div>
-    </nav>
-    <!-- Hero Section -->
-    <div class="hero-bg text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-48">
-            <div class="max-w-3xl">
-                <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                    赋能智能新能源汽车<br>
-                    <span class="text-blue-400">构建数字监管新生态</span>
-                </h1>
-                <p class="text-xl text-gray-200 mb-8 leading-relaxed">
-                    致力于智能新能源汽车数字监管技术的创新与应用，推动行业标准化，保障市场秩序，服务国家战略，引领产业高质量发展。
-                </p>
-                <div class="flex flex-wrap gap-4">
-                    <a href="#about" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full transition duration-300 shadow-lg">
-                        了解更多
-                    </a>
-                    <a href="#activities" class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white font-semibold py-3 px-8 rounded-full transition duration-300">
-                        最新动态
-                    </a>
+        </nav>
+    </div>
+
+    <!-- ================= 3. 首屏轮播 (动态版) ================= -->
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-0">
+        <!-- 容器 ID: banner-container -->
+        <div id="banner-container" class="relative w-full h-[350px] md:h-[500px] overflow-hidden group bg-gray-200">
+            
+            <!-- 轮播内容轨道 -->
+            <div id="banner-track" class="w-full h-full relative">
+                <!-- JS 将在这里动态插入 slides -->
+                <div class="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
                 </div>
             </div>
+
+            <!-- 指示点 (Dots) -->
+            <div id="banner-dots" class="absolute bottom-6 left-8 z-20 flex gap-3">
+                <!-- JS 将在这里插入 dots -->
+            </div>
+
+            <!-- 左右箭头 -->
+            <button id="banner-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/20 hover:bg-[#004098] text-white flex items-center justify-center rounded-full transition opacity-0 group-hover:opacity-100 backdrop-blur-sm z-20">
+                <i class="fa-solid fa-chevron-left text-xl"></i>
+            </button>
+            <button id="banner-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/20 hover:bg-[#004098] text-white flex items-center justify-center rounded-full transition opacity-0 group-hover:opacity-100 backdrop-blur-sm z-20">
+                <i class="fa-solid fa-chevron-right text-xl"></i>
+            </button>
         </div>
     </div>
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-900">中心概况</h2>
-                <div class="w-20 h-1 bg-blue-600 mx-auto mt-4"></div>
-                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-                    国家市场监督管理总局技术创新中心（新能源汽车数字监管技术及应用）由国家市场监督管理总局指导、中国汽研牵头承建，以“做好新能源汽车数字监管科技创新，守护新能源汽车产品质量安全”为目标，于2021年9月获批、2024年9月进入正式运行序列，系总局首个汽车领域技术创新中心。
-                </p>
-            </div>
+
+    <!-- ================= 4. 内容主体区域 ================= -->
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- 错误提示容器 -->
+        <div id="error-alert" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+            <p class="font-bold">连接错误</p>
+            <p id="error-msg">无法连接到数据库，请检查网络。</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <img src="figure/jianguan.png" alt="Research Lab" class="rounded-lg shadow-xl w-full object-cover h-80">
+            <!-- 左侧：新闻动态 -->
+            <div class="lg:col-span-2 bg-white p-6 rounded shadow border border-gray-100">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-[#004098] flex items-center tracking-wide">
+                        <span class="w-1.5 h-6 bg-[#004098] mr-3 rounded-full"></span>新闻动态
+                    </h2>
+                    <a href="news.html?category=news" class="text-sm text-gray-400 hover:text-[#004098] transition flex items-center">
+                        查看更多 <i class="fa-solid fa-angle-right ml-1"></i>
+                    </a>
                 </div>
-                <div class="space-y-6">
-                    <h3 class="text-2xl font-bold text-gray-800">主要定位</h3>
-                    <p class="text-gray-600 leading-relaxed">
-                        创新中心聚焦智能新能源汽车数字监管技术创新与应用，致力于建设成为国家市场监管总局技术支撑中心、新能源汽车安全技术创新策源地、行业服务与人才培养基地和产业高质量发展成果输出高地。
-                    </p>
-                    <ul class="space-y-4">
-                        <li class="flex items-start">
-                            <svg class="h-6 w-6 text-green-500 mr-2 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span class="text-gray-700 font-bold">国家市场监管总局技术服务与支撑机构</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-6 w-6 text-green-500 mr-2 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span class="text-gray-700 font-bold">汽车安全技术创新策源地</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-6 w-6 text-green-500 mr-2 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span class="text-gray-700 font-bold">行业共性服务与人才培养基地</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-6 w-6 text-green-500 mr-2 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span class="text-gray-700 font-bold">汽车产业高质量发展成果输出高地</span>
-                        </li>
-                    </ul>
+
+                <!-- 头条 (原本的位置，如果轮播图已经展示了头条，这里可以展示次头条或者列表，视情况而定) -->
+                <!-- 为了版面丰富，我们依然保留这个头条位置，展示最新的一条非轮播新闻，或者保持原样 -->
+                <div id="news-headline-container" class="min-h-[200px] flex items-center justify-center">
+                    <i class="fa-solid fa-spinner fa-spin text-[#004098] text-2xl"></i>
+                </div>
+
+                <!-- 列表 -->
+                <ul id="news-list-container" class="space-y-4 mt-8"></ul>
+            </div>
+
+            <!-- 右侧：通知公告 -->
+            <div class="lg:col-span-1 bg-white p-6 rounded shadow border border-gray-100">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-[#004098] flex items-center tracking-wide">
+                        <span class="w-1.5 h-6 bg-[#004098] mr-3 rounded-full"></span>通知公告
+                    </h2>
+                    <a href="news.html?category=notice" class="text-sm text-gray-400 hover:text-[#004098] transition">
+                        更多 <i class="fa-solid fa-angle-right ml-1"></i>
+                    </a>
+                </div>
+                <div id="notice-list-container" class="space-y-5">
+                    <div class="text-center text-gray-400 py-4"><i class="fa-solid fa-spinner fa-spin"></i></div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Placeholder for other sections -->
-         <!-- Placeholder for other sections -->
-    <div id="content-placeholder"></div>
-    <!-- Footer will go here -->
-    <!-- Functions Section -->
-    <section id="functions" class="py-20 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-900">职责职能</h2>
-                <div class="w-20 h-1 bg-blue-600 mx-auto mt-4"></div>
-                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-                    聚焦核心业务，始终围绕“服务政府、促进行业、助力企业”开展工作，全方位推动智能新能源汽车数字监管技术进步
-                </p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Function 1 -->
-                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300 border-t-4 border-blue-500 group">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-blue-600 transition">
-                        <svg class="h-8 w-8 text-blue-600 group-hover:text-white transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">标准制定</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        牵头和参与新能源汽车数字监管相关国家标准、地方标准及团体标准的研制，建立健全监管标准体系。
-                    </p>
-                </div>
-                <!-- Function 2 -->
-                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300 border-t-4 border-green-500 group">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-green-600 transition">
-                        <svg class="h-8 w-8 text-green-600 group-hover:text-white transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">技术创新</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        搭建高水平学术交流平台，组织开展新能源汽车平台基础技术、数字监管技术与安全共性技术等监管技术研讨。
-                    </p>
-                </div>
-                <!-- Function 3 -->
-                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300 border-t-4 border-purple-500 group">
-                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-purple-600 transition">
-                        <svg class="h-8 w-8 text-purple-600 group-hover:text-white transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">行业赛事</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        举办全国新能源汽车动力电池安全预警算法大赛、中国青年科技创新揭榜挂帅擂台赛，挖掘优秀人才与创新应用。
-                    </p>
-                </div>
-                <!-- Function 4 -->
-                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300 border-t-4 border-orange-500 group">
-                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-orange-600 transition">
-                        <svg class="h-8 w-8 text-orange-600 group-hover:text-white transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">新闻宣传</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        发布行业权威报告，公示技术创新成果，开展科普宣传，引导社会正确认知新能源汽车技术。
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- News & Activities Section -->
-    <section id="activities" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-end mb-12">
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-900">新闻活动</h2>
-                    <div class="w-20 h-1 bg-blue-600 mt-4"></div>
-                </div>
-                <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold text-sm hidden sm:block">查看所有新闻 &rarr;</a>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Featured News (Left Large) -->
-                <div class="lg:col-span-2 group cursor-pointer">
-                    <div class="relative h-96 rounded-2xl overflow-hidden shadow-lg">
-                        <img src="figure/huiyi.png" alt="Conference" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
-                        <div class="absolute bottom-0 left-0 p-8">
-                            <span class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">重要活动</span>
-                            <h3 class="text-2xl text-white font-bold mb-2 group-hover:text-blue-300 transition">新能源汽车产品缺陷与安全管理标准体系建设研讨会在京召开</h3>
-                            <p class="text-gray-300 text-sm line-clamp-2">
-                                由TC463全国产品缺陷与安全管理标准化技术委员会指导、创新中心主办的“新能源汽车产品缺陷与安全管理标准体系建设研讨会”在北京顺利召开。
-                            </p>
-                            <p class="text-gray-400 text-xs mt-4">2023年3月11日</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- News List (Right Side) -->
-                <div class="space-y-6">
-                    <!-- News Item 1 -->
-                    <div class="flex gap-4 items-start group cursor-pointer">
-                        <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden">
-                            <img src="figure/biaozhun.png" alt="Standard" class="w-full h-full object-cover group-hover:opacity-90 transition">
-                        </div>
-                        <div>
-                            <span class="text-blue-600 text-xs font-bold">标准公示</span>
-                            <h4 class="text-gray-900 font-bold leading-snug group-hover:text-blue-600 transition">关于召开《汽车生产者召回管理体系评级规范》等2项团体标准研讨会的通知</h4>
-                            <p class="text-gray-400 text-xs mt-2">2025年09月29日</p>
-                        </div>
-                    </div>
-                    <!-- News Item 2 -->
-                    <div class="flex gap-4 items-start group cursor-pointer">
-                        <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden">
-                            <img src="figure/bisai.jpg" alt="Competition" class="w-full h-full object-cover group-hover:opacity-90 transition">
-                        </div>
-                        <div>
-                            <span class="text-purple-600 text-xs font-bold">行业赛事</span>
-                            <h4 class="text-gray-900 font-bold leading-snug group-hover:text-purple-600 transition">“创新中心承办的2025年度中国青年科技创新“揭榜挂帅”擂台赛赛题终审圆满落幕</h4>
-                            <p class="text-gray-400 text-xs mt-2">2025年10月16日</p>
-                        </div>
-                    </div>
-                    <!-- News Item 3 -->
-                    <div class="flex gap-4 items-start group cursor-pointer">
-                        <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden">
-                            <img src="figure/luntan.png" alt="Meeting" class="w-full h-full object-cover group-hover:opacity-90 transition">
-                        </div>
-                        <div>
-                            <span class="text-green-600 text-xs font-bold">技术交流</span>
-                            <h4 class="text-gray-900 font-bold leading-snug group-hover:text-green-600 transition">2025汽车技术与装备发展论坛“电池安全 神机妙‘算’”主题分论坛顺利召开</h4>
-                            <p class="text-gray-400 text-xs mt-2">2025年11月11日</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Standards Section -->
-    <section id="standards" class="py-20 bg-blue-900 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-             <h2 class="text-3xl font-bold mb-12">重点标准工作</h2>
-             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                 <div class="bg-blue-800 p-8 rounded-lg border border-blue-700 hover:bg-blue-700 transition">
-                     <div class="text-4xl font-bold text-blue-300 mb-4">GB/T</div>
-                     <h3 class="text-xl font-bold mb-2">国家标准</h3>
-                     <p class="text-blue-200 text-sm">参与《纯电动汽车火灾缺陷分析方法》、《纯电动汽车动力蓄电池健康与安全状态评估方法》等推荐性国标研制。</p>
-                 </div>
-                 <div class="bg-blue-800 p-8 rounded-lg border border-blue-700 hover:bg-blue-700 transition">
-                     <div class="text-4xl font-bold text-green-300 mb-4">DB/T</div>
-                     <h3 class="text-xl font-bold mb-2">地方标准</h3>
-                     <p class="text-blue-200 text-sm">主导《新能源汽车公共数据采集技术规范》地方标准制定，在GB/T32960的基础上，结合重庆市、海南省地方安全监管要求，描述了电动汽车远程服务与管理系统架构和电动汽车安全监测数据分类，规定了电动汽车安全监测数据的上传要求、数据包格式和定义、数据单元格式和定义、数据质量控制等内容。</p>
-                 </div>
-                 <div class="bg-blue-800 p-8 rounded-lg border border-blue-700 hover:bg-blue-700 transition">
-                     <div class="text-4xl font-bold text-purple-300 mb-4">TB</div>
-                     <h3 class="text-xl font-bold mb-2">团体标准</h3>
-                     <p class="text-blue-200 text-sm">快速响应市场需求，制定前沿技术团体标准，引领技术创新方向。主导研制了《T/CAAMTB 199-2024电动汽车电池系统安全预警模型评价方法》，给出了电动汽车电池系统安全预警模型的评价数据集构建、评价方法、评价报告等内容，适用于电动汽车电池系统混合故障模式安全预警模型的评价， 单故障模式安全预警模型的评价参照适用。</p>
-                 </div>
-             </div>
-             <div class="mt-12">
-                 <a href="#" class="inline-block border border-white text-white hover:bg-white hover:text-blue-900 py-3 px-8 rounded-full transition font-semibold">查看标准目录</a>
-             </div>
-        </div>
-    </section>
-    <!-- Contact & Footer -->
-    <section id="contact" class="bg-gray-900 text-gray-300 py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+    </main>
+
+    <!-- ================= 5. 页脚 ================= -->
+    <footer class="bg-[#1e293b] text-gray-400 pt-12 pb-8 mt-10 border-t-4 border-[#004098]">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
                 <div class="col-span-1 md:col-span-2">
-                    <h3 class="text-white text-lg font-bold mb-6">国家市场监督管理总局技术创新中心<br><span class="text-sm font-normal text-gray-400">（新能源汽车数字监管技术及应用）</span></h3>
-                    <p class="text-sm leading-relaxed mb-6">
-                        创新中心致力于守护新能源汽车产品质量安全，引领新能源汽车产业高质量发展。
-                    </p>
-                    <div class="flex space-x-4">
-                        <!-- Social Icons Placeholders -->
-                        <a href="#" class="text-gray-400 hover:text-white transition"><span class="sr-only">WeChat</span><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.692 11.646c-.69 0-1.252.51-1.252 1.137 0 .629.562 1.138 1.252 1.138.69 0 1.252-.51 1.252-1.138 0-.628-.562-1.137-1.252-1.137zm8.412-5.684c-4.23 0-7.66 3.094-7.66 6.908 0 1.434.483 2.77 1.315 3.88l-.69 2.195 2.486-1.16c1.326.437 2.78.691 4.312.691 4.23 0 7.66-3.093 7.66-6.907 0-3.815-3.43-6.908-7.66-6.908zm-9.82 10.093c-2.82 0-5.108-2.063-5.108-4.605 0-2.542 2.288-4.605 5.108-4.605 2.82 0 5.108 2.063 5.108 4.605 0 2.542-2.288 4.605-5.108 4.605zm11.643-6.68c-.574 0-1.04.424-1.04.947 0 .523.466.947 1.04.947.574 0 1.04-.424 1.04-.947 0-.523-.466-.947-1.04-.947z"/></svg></a>
+                    <h4 class="text-white font-bold text-lg mb-5 border-l-4 border-[#004098] pl-3">相关部门链接</h4>
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                        <a href="https://www.samr.gov.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局
+                        </a>
+                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>总局召回中心
+                        </a>
+                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国中检 (CCIC)
+                        </a>
+                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中检汽研
+                        </a>
                     </div>
                 </div>
-                <div>
-                    <h4 class="text-white text-md font-bold mb-6">快速链接</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#about" class="hover:text-white transition">国家市场监督管理总局</a></li>
-                        <li><a href="#functions" class="hover:text-white transition">总局召回中心</a></li>
-                        <li><a href="#standards" class="hover:text-white transition">中国中检</a></li>
-                        <li><a href="#activities" class="hover:text-white transition">中国汽研</a></li>
+                <div class="col-span-1 md:col-span-1">
+                    <h4 class="text-white font-bold text-lg mb-5 border-l-4 border-[#004098] pl-3">联系我们</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start"><i class="fa-solid fa-location-dot mt-1 mr-1 text-gray-500"></i> 地址：北京市朝阳区西坝河东里18号中检大厦</li>
+                        <li class="flex items-center"><i class="fa-solid fa-envelope mr-3 text-gray-500"></i> 邮箱：nevsc@caeri.com.cn</li>
+                        <li class="flex items-center"><i class="fa-solid fa-phone mr-3 text-gray-500"></i> 电话：010-88888888</li>
                     </ul>
                 </div>
-                <div>
-                    <h4 class="text-white text-md font-bold mb-6">联系方式</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <span>北京市朝阳区西坝河东里18号<br>中检大厦</span>
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                            <span>nevsc@caeri.com.cn</span>
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                            <span>010-88888888</span>
-                        </li>
-                    </ul>
+                <div class="col-span-1 md:col-span-1 flex flex-col items-center md:items-start">
+                    <h4 class="text-white font-bold text-lg mb-5">关注我们</h4>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-white p-1.5 rounded-lg shadow-lg">
+                            <img src="figure/QRcode.jpg" 
+                                 alt="微信公众号" class="w-20 h-20">
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <p class="mb-1 text-white font-bold">官方微信</p>
+                            <p>扫一扫了解更多</p>
+                            <p>行业动态</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-xs text-gray-500">
+            <div class="border-t border-gray-700 pt-8 text-center text-xs text-gray-500 font-medium">
                 <p>&copy; 2025 国家市场监督管理总局技术创新中心（新能源汽车数字监管技术及应用） 版权所有</p>
             </div>
         </div>
-    </section>
-    <div id="content-placeholder"></div>
-    <!-- Footer will go here -->
+    </footer>
+
+    <!-- ================= 6. 后端数据读取脚本 (含轮播图逻辑) ================= -->
+    <script type="module">
+        import { getArticles, getArticleById, incrementViews } from './js/api.js';
+
+        let bannerInterval;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.location.protocol === 'file:') {
+                showError("请使用 Live Server 运行！file:// 协议无法加载模块。");
+                return;
+            }
+
+            try {
+                // 1. 获取新闻数据 (多获取几条，用于分配给轮播和列表)
+                // 获取 10 条新闻，5 条公告
+                const [newsData, noticeData] = await Promise.all([
+                    getArticles(10, 'news'),
+                    getArticles(5, 'notice')
+                ]);
+
+                // 2. 初始化轮播图 (取前 3-4 条作为轮播，优先取带图的)
+                // 简单的逻辑：前 3 条作为 Banner
+                const bannerData = newsData.slice(0, 3);
+                initBanner(bannerData);
+
+                // 3. 渲染下方的新闻列表 (跳过已在 Banner 展示的前3条，或者直接展示前几条)
+                // 这里我们跳过前 1 条作为列表头条(如果需要)，或者直接渲染
+                const listData = newsData.slice(0); // 也可以 slice(3) 如果不想重复
+                renderNewsSection(listData);
+
+                // 4. 渲染公告
+                renderNoticeSection(noticeData);
+
+            } catch (error) {
+                console.error('页面数据加载异常:', error);
+                showError("数据加载失败，请检查网络连接。");
+            }
+        });
+
+        // === 轮播图逻辑 ===
+        function initBanner(articles) {
+            const track = document.getElementById('banner-track');
+            const dotsContainer = document.getElementById('banner-dots');
+            
+            if (!articles || articles.length === 0) {
+                track.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">暂无轮播图片</div>';
+                return;
+            }
+
+            let slidesHtml = '';
+            let dotsHtml = '';
+
+            articles.forEach((item, index) => {
+                // 如果没有图，用默认图
+                const imgUrl = item.image_url || 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032';
+                // 默认第一张显示，其他隐藏 (opacity-0)
+                const activeClass = index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0';
+                
+                // Slide HTML
+                slidesHtml += `
+                    <div class="banner-slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${activeClass}" data-index="${index}">
+                        <a href="news-detail.html?id=${item.id}" class="block w-full h-full cursor-pointer">
+                            <img src="${imgUrl}" class="w-full h-full object-cover" alt="${item.title}">
+                            <!-- 底部文字渐变遮罩 -->
+                            <div class="absolute bottom-0 w-full bg-gradient-to-t from-[#004098]/90 via-[#004098]/60 to-transparent pt-24 pb-8 px-8">
+                                <h2 class="text-xl md:text-3xl font-bold text-white mb-3 tracking-wide drop-shadow-lg line-clamp-2">
+                                    ${item.title}
+                                </h2>
+                            </div>
+                        </a>
+                    </div>
+                `;
+
+                // Dot HTML
+                const dotActive = index === 0 ? 'bg-white w-8' : 'bg-white/40 w-8 hover:bg-white';
+                dotsHtml += `<span class="h-1 rounded-sm shadow-sm cursor-pointer transition-all duration-300 ${dotActive}" data-index="${index}"></span>`;
+            });
+
+            track.innerHTML = slidesHtml;
+            dotsContainer.innerHTML = dotsHtml;
+
+            // 绑定事件
+            setupBannerEvents(articles.length);
+        }
+
+        function setupBannerEvents(count) {
+            let currentIndex = 0;
+            const slides = document.querySelectorAll('.banner-slide');
+            const dots = document.querySelectorAll('#banner-dots span');
+            
+            const showSlide = (index) => {
+                // 处理索引越界
+                if (index >= count) index = 0;
+                if (index < 0) index = count - 1;
+                currentIndex = index;
+
+                // 切换 Slide
+                slides.forEach(slide => {
+                    slide.classList.remove('opacity-100', 'z-10');
+                    slide.classList.add('opacity-0', 'z-0');
+                });
+                slides[currentIndex].classList.remove('opacity-0', 'z-0');
+                slides[currentIndex].classList.add('opacity-100', 'z-10');
+
+                // 切换 Dots
+                dots.forEach(dot => {
+                    dot.className = 'bg-white/40 w-8 h-1 rounded-sm shadow-sm cursor-pointer transition-all duration-300 hover:bg-white';
+                });
+                dots[currentIndex].className = 'bg-white w-8 h-1 rounded-sm shadow-sm cursor-pointer transition-all duration-300';
+            };
+
+            // 自动轮播
+            const startAutoPlay = () => {
+                stopAutoPlay();
+                bannerInterval = setInterval(() => {
+                    showSlide(currentIndex + 1);
+                }, 5000); // 5秒切换
+            };
+
+            const stopAutoPlay = () => {
+                if (bannerInterval) clearInterval(bannerInterval);
+            };
+
+            // 按钮点击
+            document.getElementById('banner-prev').addEventListener('click', () => {
+                stopAutoPlay();
+                showSlide(currentIndex - 1);
+                startAutoPlay();
+            });
+            document.getElementById('banner-next').addEventListener('click', () => {
+                stopAutoPlay();
+                showSlide(currentIndex + 1);
+                startAutoPlay();
+            });
+
+            // Dots 点击
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => {
+                    stopAutoPlay();
+                    showSlide(idx);
+                    startAutoPlay();
+                });
+            });
+
+            // 启动
+            startAutoPlay();
+        }
+
+        // === 下方列表渲染逻辑 (与之前类似) ===
+        function renderNewsSection(data) {
+            const headlineContainer = document.getElementById('news-headline-container');
+            const listContainer = document.getElementById('news-list-container');
+            
+            if (!data || data.length === 0) {
+                headlineContainer.innerHTML = '<p class="text-gray-400 text-sm">暂无新闻</p>';
+                return;
+            }
+
+            // 1. 列表头条 (取第一条，或者取非轮播的第一条)
+            // 这里我们简单取数据中的第一条作为“列表区的头条”
+            const headline = data[0]; 
+            const coverImg = headline.image_url || 'https://images.unsplash.com/photo-1544531696-609805d76d65?q=80&w=2072';
+            const dateStr = new Date(headline.created_at).toISOString().split('T')[0];
+
+            headlineContainer.innerHTML = `
+                <a href="news-detail.html?id=${headline.id}" class="flex flex-col sm:flex-row gap-6 mb-8 cursor-pointer group block">
+                    <div class="w-full sm:w-72 h-44 overflow-hidden rounded-sm shrink-0 shadow-sm relative">
+                        <img src="${coverImg}" class="w-full h-full object-cover transform transition duration-500 group-hover:scale-105" alt="新闻图">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-1">
+                        <div>
+                            <h3 class="text-lg font-bold text-[#333] mb-3 group-hover:text-[#004098] transition leading-snug">
+                                ${headline.title}
+                            </h3>
+                            <p class="text-sm text-[#666] leading-relaxed line-clamp-2 md:line-clamp-3">
+                                ${headline.summary || '暂无摘要'}
+                            </p>
+                        </div>
+                        <span class="text-xs text-gray-400 mt-2 font-mono flex items-center">
+                            <i class="fa-regular fa-calendar-check mr-2 text-[#004098]/60"></i> ${dateStr}
+                        </span>
+                    </div>
+                </a>
+            `;
+
+            // 2. 列表 (排除刚才展示的那一条)
+            const listItems = data.slice(1, 5); // 取接下来的4条
+            let listHtml = '';
+            listItems.forEach(item => {
+                const itemDate = new Date(item.created_at).toISOString().split('T')[0];
+                listHtml += `
+                    <li class="border-b border-dashed border-gray-100 pb-3 last:border-0 hover:translate-x-1 transition-all duration-300">
+                        <a href="news-detail.html?id=${item.id}" class="flex items-center justify-between group cursor-pointer w-full">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <i class="fa-solid fa-caret-right text-gray-300 group-hover:text-[#004098] text-xs"></i>
+                                <span class="text-[#333] truncate group-hover:text-[#004098] text-sm md:text-base font-medium">
+                                    ${item.title}
+                                </span>
+                            </div>
+                            <span class="text-gray-400 text-sm shrink-0 font-mono">${itemDate}</span>
+                        </a>
+                    </li>
+                `;
+            });
+            listContainer.innerHTML = listHtml;
+        }
+
+        function renderNoticeSection(data) {
+            const container = document.getElementById('notice-list-container');
+            if (!data || data.length === 0) return;
+
+            let html = '';
+            data.forEach(item => {
+                const dateObj = new Date(item.created_at);
+                const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+                const day = dateObj.getDate().toString().padStart(2, '0');
+                const dateDisplay = `${month}-${day}`;
+                const year = dateObj.getFullYear();
+
+                html += `
+                    <div class="flex gap-4 group cursor-pointer" onclick="window.location.href='news-detail.html?id=${item.id}'">
+                        <div class="w-14 h-14 bg-blue-50 text-[#004098] border border-blue-100 flex flex-col items-center justify-center rounded-sm shrink-0 group-hover:bg-[#004098] group-hover:text-white transition shadow-sm">
+                            <span class="text-xs scale-90 opacity-80">${year}</span>
+                            <span class="text-lg font-bold leading-none font-mono">${dateDisplay}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-[#333] group-hover:text-[#004098] leading-snug line-clamp-2 font-medium mt-1 transition">
+                                ${item.title}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function showError(msg) {
+            document.getElementById('error-alert').classList.remove('hidden');
+            document.getElementById('error-msg').innerHTML = msg;
+        }
+    </script>
+    <!-- 引入 API (如果之前没引) 和 Search 逻辑 -->
+    <script type="module" src="js/search.js"></script>
 </body>
 </html>

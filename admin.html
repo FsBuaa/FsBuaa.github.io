@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style> .active-nav { background-color: #1e293b; border-left: 4px solid #3b82f6; color: white !important; } </style>
+</head>
+<body class="bg-gray-100 h-screen flex overflow-hidden font-sans text-gray-800">
+
+    <!-- 登录 -->
+    <div id="login-modal" class="fixed inset-0 bg-[#001540] z-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-96 text-center">
+            <h2 class="text-2xl font-bold mb-6">管理员登录</h2>
+            <form id="loginForm" class="space-y-4">
+                <input type="email" id="email" placeholder="邮箱" class="w-full border p-3 rounded" required>
+                <input type="password" id="password" placeholder="密码" class="w-full border p-3 rounded" required>
+                <button type="submit" id="loginBtn" class="w-full bg-[#004098] text-white py-3 rounded font-bold">登录</button>
+            </form>
+            <p id="loginError" class="text-red-500 text-xs mt-4 hidden"></p>
+            <div class="mt-6 pt-4 border-t"><a href="index.html" class="text-sm text-gray-500 hover:text-blue-600">← 返回首页</a></div>
+        </div>
+    </div>
+
+    <!-- 侧边栏 -->
+    <aside class="w-64 bg-[#001540] text-gray-300 flex-col hidden shadow-xl z-20" id="sidebar">
+        <div class="p-6 border-b border-white/10 text-center"><h1 class="font-bold text-xl text-white">创新中心管理</h1><p class="text-xs mt-1" id="currentUser">admin</p></div>
+        <nav class="flex-1 mt-6">
+            <button onclick="switchTab('news')" id="nav-news" class="w-full text-left px-6 py-4 active-nav transition"><i class="fa-solid fa-newspaper w-6"></i> 新闻发布</button>
+            <button onclick="switchTab('activity')" id="nav-activity" class="w-full text-left px-6 py-4 transition hover:bg-white/5"><i class="fa-solid fa-calendar-check w-6"></i> 行业活动</button>
+            <button onclick="switchTab('project')" id="nav-project" class="w-full text-left px-6 py-4 transition hover:bg-white/5"><i class="fa-solid fa-flask w-6"></i> 课题研究</button>
+            <button onclick="switchTab('standard')" id="nav-standard" class="w-full text-left px-6 py-4 transition hover:bg-white/5"><i class="fa-solid fa-file-alt w-6"></i> 标准研制</button>
+        </nav>
+        <div class="p-4"><button id="logoutBtn" class="w-full py-2 border border-white/20 rounded hover:bg-white/10">退出登录</button></div>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="flex-1 bg-gray-50 overflow-y-auto p-8 hidden" id="main-content">
+        <!-- 新闻 -->
+        <section id="section-news" class="max-w-5xl mx-auto">
+            <h2 class="text-2xl font-bold mb-6 border-l-4 border-blue-800 pl-4">新闻管理</h2>
+            <div class="bg-white p-6 rounded shadow mb-8">
+                <div class="flex justify-between mb-4"><h3 class="font-bold text-lg" id="newsFormTitle">发布新闻</h3><span id="newsDraftTip" class="text-xs text-green-600 hidden">草稿已存</span></div>
+                <form id="newsForm" class="space-y-4">
+                    <input type="hidden" id="newsId">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="newsTitle" placeholder="标题" class="md:col-span-2 border p-2 rounded" required>
+                        <select id="newsCategory" class="border p-2 rounded">
+                            <option value="news">新闻</option>
+                            <option value="notice">公告</option>
+                        </select>
+                        <input type="text" id="newsSource" placeholder="来源" class="border p-2 rounded">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="date" id="newsPublishDate" class="border p-2 rounded">
+                        <input type="text" id="newsAuthor" placeholder="作者" class="border p-2 rounded">
+                    </div>
+                    <textarea id="newsSummary" placeholder="摘要" class="w-full border p-2 rounded h-20"></textarea>
+                    <input type="file" id="newsCover" accept="image/*" class="text-sm">
+                    <div id="editor-container" class="h-64 bg-white"></div>
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="bg-[#004098] text-white px-6 py-2 rounded">提交</button>
+                        <button type="button" onclick="cancelEdit('news')" id="newsCancelBtn" class="bg-gray-300 px-6 py-2 rounded hidden">撤销</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-white p-6 rounded shadow">
+                <div class="flex justify-between mb-4"><h3 class="font-bold">列表</h3><input type="text" id="searchNews" placeholder="搜索..." class="border rounded px-3 py-1 text-sm"></div>
+                <ul id="newsList" class="space-y-2"></ul>
+            </div>
+        </section>
+
+        <!-- 活动 -->
+        <section id="section-activity" class="hidden max-w-5xl mx-auto">
+            <h2 class="text-2xl font-bold mb-6 border-l-4 border-yellow-500 pl-4">活动管理</h2>
+            <div class="bg-white p-6 rounded shadow mb-8 border-t-4 border-yellow-500">
+                <div class="flex justify-between mb-4"><h3 class="font-bold text-lg" id="actFormTitle">新增活动</h3><span id="actDraftTip" class="text-xs text-green-600 hidden">草稿已存</span></div>
+                <form id="actForm" class="grid grid-cols-2 gap-4">
+                    <input type="hidden" id="actId">
+                    <input type="text" id="actTitle" placeholder="活动名称" class="col-span-2 border p-2 rounded" required>
+                    <input type="text" id="actDate" placeholder="时间" class="border p-2 rounded">
+                    <input type="text" id="actLoc" placeholder="地点" class="border p-2 rounded">
+                    <textarea id="actSummary" placeholder="简介" class="col-span-2 border p-2 rounded h-20"></textarea>
+                    <input type="file" id="actImg" accept="image/*" class="col-span-2 text-sm">
+                    <div class="col-span-2 flex gap-4"><button type="submit" class="bg-yellow-600 text-white px-6 py-2 rounded">提交</button><button type="button" onclick="cancelEdit('act')" id="actCancelBtn" class="bg-gray-300 px-6 py-2 rounded hidden">撤销</button></div>
+                </form>
+            </div>
+            <div class="bg-white p-6 rounded shadow">
+                <div class="flex justify-between mb-4"><h3 class="font-bold">列表</h3><input type="text" id="searchAct" placeholder="搜索..." class="border rounded px-3 py-1 text-sm"></div>
+                <ul id="actList" class="space-y-2"></ul>
+            </div>
+        </section>
+
+        <!-- 课题 -->
+        <section id="section-project" class="hidden max-w-5xl mx-auto">
+            <h2 class="text-2xl font-bold mb-6 border-l-4 border-green-500 pl-4">课题管理</h2>
+            <div class="bg-white p-6 rounded shadow mb-8 border-t-4 border-green-500">
+                <div class="flex justify-between mb-4"><h3 class="font-bold text-lg" id="projFormTitle">新增课题</h3><span id="projDraftTip" class="text-xs text-green-600 hidden">草稿已存</span></div>
+                <form id="projForm" class="grid grid-cols-3 gap-4">
+                    <input type="hidden" id="projId">
+                    <input type="text" id="projName" placeholder="课题名称" class="col-span-2 border p-2 rounded" required>
+                    <select id="projType" class="border p-2 rounded"><option>国家重点</option><option>总局科技</option><option>企业横向</option></select>
+                    <select id="projStage" class="border p-2 rounded"><option>进行中</option><option>验收阶段</option><option>已完成</option></select>
+                    <input type="text" id="projRole" placeholder="承担角色" class="col-span-2 border p-2 rounded">
+                    <textarea id="projContent" placeholder="研究内容" class="col-span-3 border p-2 rounded h-20"></textarea>
+                    <div class="col-span-3 flex gap-4"><button type="submit" class="bg-green-600 text-white px-6 py-2 rounded">提交</button><button type="button" onclick="cancelEdit('proj')" id="projCancelBtn" class="bg-gray-300 px-6 py-2 rounded hidden">撤销</button></div>
+                </form>
+            </div>
+            <div class="bg-white p-6 rounded shadow">
+                <div class="flex justify-between mb-4"><h3 class="font-bold">列表</h3><input type="text" id="searchProj" placeholder="搜索..." class="border rounded px-3 py-1 text-sm"></div>
+                <table class="w-full text-sm text-left"><tbody id="projList"></tbody></table>
+            </div>
+        </section>
+
+        <!-- 标准 -->
+        <section id="section-standard" class="hidden max-w-5xl mx-auto">
+            <h2 class="text-2xl font-bold mb-6 border-l-4 border-purple-500 pl-4">标准管理</h2>
+            <div class="bg-white p-6 rounded shadow mb-8 border-t-4 border-purple-500">
+                <div class="flex justify-between mb-4"><h3 class="font-bold text-lg" id="stdFormTitle">新增标准</h3><span id="stdDraftTip" class="text-xs text-green-600 hidden">草稿已存</span></div>
+                <form id="stdForm" class="grid grid-cols-2 gap-4">
+                    <input type="hidden" id="stdId">
+                    <input type="text" id="stdCode" placeholder="标准编号 (如 GB/T 12345-2023)" class="col-span-2 border p-2 rounded" required>
+                    <input type="text" id="stdTitle" placeholder="标准名称" class="col-span-2 border p-2 rounded" required>
+                    <select id="stdType" class="border p-2 rounded">
+                        <option value="GB">国家标准</option>
+                        <option value="QC">行业标准</option>
+                        <option value="DB">地方标准</option>
+                        <option value="T">团体标准</option>
+                        <option value="other">其他</option>
+                    </select>
+                    <select id="stdStatus" class="border p-2 rounded">
+                        <option value="active">现行</option>
+                        <option value="draft">征求意见</option>
+                        <option value="upcoming">即将实施</option>
+                        <option value="expired">已废止</option>
+                    </select>
+                    
+                    <!-- 发布日期 -->
+                    <div class="space-y-1">
+                        <label for="stdPublishDate" class="block text-sm font-medium text-gray-700">
+                            发布日期 <span class="text-xs text-gray-500">(标准正式公布的日期)</span>
+                        </label>
+                        <input type="date" id="stdPublishDate" class="w-full border p-2 rounded">
+                    </div>
+                    
+                    <!-- 实施日期 -->
+                    <div class="space-y-1">
+                        <label for="stdImplementDate" class="block text-sm font-medium text-gray-700">
+                            实施日期 <span class="text-xs text-gray-500">(标准开始执行的日期)</span>
+                        </label>
+                        <input type="date" id="stdImplementDate" class="w-full border p-2 rounded">
+                    </div>
+                    
+                    <input type="text" id="stdDepartment" placeholder="主管部门" value="国家标准化管理委员会" class="col-span-2 border p-2 rounded">
+                    <textarea id="stdDescription" placeholder="标准描述/适用范围" class="col-span-2 border p-2 rounded h-32"></textarea>
+                    
+                    <!-- 文件上传区域 -->
+                    <div class="col-span-2 space-y-2">
+                        <label for="stdPdf" class="block text-sm font-medium text-gray-700">标准文件 (PDF格式)</label>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <input type="file" id="stdPdf" accept=".pdf" class="border p-2 rounded text-sm flex-1">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="noPdfUpload" class="mr-2 h-4 w-4">
+                                <label for="noPdfUpload" class="text-sm text-gray-600">不上传文件</label>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500">如需上传标准全文，请选择PDF文件。如标准文件未公开，可选择"不上传文件"。</p>
+                    </div>
+                    
+                    <div class="col-span-2 flex gap-4">
+                        <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded">提交</button>
+                        <button type="button" onclick="cancelEdit('std')" id="stdCancelBtn" class="bg-gray-300 px-6 py-2 rounded hidden">撤销</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-white p-6 rounded shadow">
+                <div class="flex justify-between mb-4">
+                    <h3 class="font-bold">标准列表</h3>
+                    <input type="text" id="searchStd" placeholder="搜索标准编号或名称..." class="border rounded px-3 py-1 text-sm">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead class="bg-gray-50">
+                            <tr class="border-b">
+                                <th class="p-3 font-medium">标准编号</th>
+                                <th class="p-3 font-medium">标准名称</th>
+                                <th class="p-3 font-medium">类型</th>
+                                <th class="p-3 font-medium">状态</th>
+                                <th class="p-3 font-medium">发布日期</th>
+                                <th class="p-3 font-medium">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stdList">
+                            <!-- JS动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script type="module" src="js/admin.js"></script>
+    <script>
+        window.switchTab = (tab) => {
+            ['news', 'activity', 'project', 'standard'].forEach(t => {
+                document.getElementById(`section-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).classList.remove('active-nav');
+            });
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            document.getElementById(`nav-${tab}`).classList.add('active-nav');
+        };
+
+        // 处理"不上传文件"复选框逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            const pdfInput = document.getElementById('stdPdf');
+            const noUploadCheckbox = document.getElementById('noPdfUpload');
+            
+            if (pdfInput && noUploadCheckbox) {
+                // 当选中"不上传文件"时，禁用文件输入
+                noUploadCheckbox.addEventListener('change', function() {
+                    pdfInput.disabled = this.checked;
+                    if (this.checked) {
+                        pdfInput.value = '';
+                    }
+                });
+                
+                // 当选择文件时，取消"不上传文件"的选中状态
+                pdfInput.addEventListener('change', function() {
+                    if (this.files.length > 0) {
+                        noUploadCheckbox.checked = false;
+                        noUploadCheckbox.disabled = false;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
