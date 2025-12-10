@@ -153,7 +153,13 @@
     <!-- ================= 3. 列表主体 ================= -->
     <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
         <div class="bg-white p-8 rounded shadow-sm border border-gray-100 min-h-[500px]">
-            <h1 id="page-title" class="text-2xl font-bold text-[#004098] mb-8 border-b pb-4">文章列表</h1>
+            <!-- 修改部分：调整标题样式为 research.html 中的“关键技术”样式 -->
+            <div class="flex flex-col justify-start items-start mb-8">
+                <h1 id="page-title" class="text-3xl font-bold text-[#004098] relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-16 after:h-1 after:bg-[#004098]">
+                    文章列表
+                </h1>
+            </div>
+            <!-- 修改结束 -->
             
             <ul id="list-container" class="space-y-6">
                 <!-- JS 动态渲染列表 -->
@@ -175,13 +181,13 @@
                             <i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局
                         </a>
                         <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
-                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>总局召回中心
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局缺陷产品召回技术中心
                         </a>
                         <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
-                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国中检 (CCIC)
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国检验认证集团
                         </a>
                         <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
-                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中检汽研
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国汽车工程研究院股份有限公司
                         </a>
                     </div>
                 </div>

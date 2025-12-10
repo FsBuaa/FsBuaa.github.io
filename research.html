@@ -205,9 +205,9 @@
                     <h4 class="text-white font-bold text-lg mb-5 border-l-4 border-[#004098] pl-3">相关部门链接</h4>
                     <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
                         <a href="https://www.samr.gov.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局</a>
-                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>总局召回中心</a>
-                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中国中检 (CCIC)</a>
-                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中检汽研</a>
+                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局缺陷产品召回技术中心</a>
+                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中国检验认证集团</a>
+                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中国汽车工程研究院股份有限公司</a>
                     </div>
                 </div>
 
@@ -269,7 +269,7 @@
                         const content = item.content || '暂无内容';
                         
                         html += `
-                            <tr class="hover:bg-blue-50 transition border-b border-gray-100 last:border-0 cursor-pointer" onclick="window.location.href='research-detail.html?id=${item.id}'">
+                            <tr class="hover:bg-blue-50 transition border-b border-gray-100 last:border-0 cursor-pointer" onclick="window.location.href='#'">
                                 <td class="px-6 py-4 text-center font-mono text-gray-500 font-bold">${index + 1}</td>
                                 <td class="px-6 py-4 text-center font-bold text-[#004098]">${item.type || '-'}</td>
                                 <td class="px-6 py-4 font-medium text-[#333]">${item.name}</td>
