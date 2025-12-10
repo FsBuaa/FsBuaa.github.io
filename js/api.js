@@ -149,3 +149,20 @@ export async function incrementViews(id) {
     supabase.rpc('increment_views', { article_id: id })
         .catch(err => console.warn('更新浏览量失败:', err));
 }
+
+// --- 在 js/api.js 中添加或修改 ---
+
+// 通用文件上传 (支持图片和文档)
+export async function uploadFile(file, bucket = 'news-images') {
+    if (!supabase) throw new Error("数据库未连接");
+    
+    // 生成唯一文件名，保留后缀
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${fileExt}`;
+    
+    const { error } = await supabase.storage.from(bucket).upload(fileName, file);
+    if (error) throw error;
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
+    return data.publicUrl;
+}
