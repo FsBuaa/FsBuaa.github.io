@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 PDF.js 核心库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -29,7 +31,7 @@
     <style>
         body { font-family: "Microsoft YaHei", sans-serif; }
         
-        /* --- 头部科技感背景 (与 Index 保持一致) --- */
+        /* --- 头部科技感背景 (保持与 Index 一致) --- */
         .header-tech-bg {
             background-color: #001540;
             background-image: 
@@ -57,16 +59,24 @@
         .group:hover .group-hover\:block { display: block; animation: fadeIn 0.2s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* PDF 工具栏按钮样式 */
+        .pdf-btn {
+            @apply px-3 py-1.5 rounded text-gray-600 hover:bg-gray-200 hover:text-blue-700 transition text-sm flex items-center justify-center;
+        }
+        .pdf-btn:disabled {
+            @apply opacity-50 cursor-not-allowed hover:bg-transparent hover:text-gray-600;
+        }
+
         /* 状态标签颜色 */
-        .badge-active { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } /* 现行 */
-        .badge-draft { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; } /* 征求意见 */
-        .badge-upcoming { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } /* 即将实施 */
-        .badge-expired { background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; } /* 废止 */
+        .badge-active { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-draft { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+        .badge-upcoming { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .badge-expired { background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
     </style>
 </head>
 <body class="bg-gray-50 text-[#333] flex flex-col min-h-screen">
 
-    <!-- ================= 1. 顶部 Header (与 Index 完全一致) ================= -->
+    <!-- ================= 1. 顶部 Header (严格与 Index 一致) ================= -->
     <div class="w-full text-white pb-0 header-tech-bg">
         <header class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-7 relative z-10">
             <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
@@ -105,13 +115,18 @@
         <nav class="border-t border-white/10 mt-2 relative z-10" style="background-color: rgba(255, 255, 255, 0.05);"> 
             <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-wrap justify-center space-x-2">
+                    <!-- 首页 (变为普通样式) -->
                     <a href="index.html" class="nav-item text-blue-100 hover:text-white px-8 py-4 text-base tracking-widest transition relative">首页</a>
+                    
                     <a href="about.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">中心概况</a>
-                    <a href="news.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
+                    <a href="news.html?category=news" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">新闻动态</a>
                     <a href="activity.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">行业活动</a>
-                    <!-- 当前页高亮 -->
+                    
+                    <!-- 标准研制 (高亮样式) -->
                     <a href="standards.html" class="text-white font-bold px-6 py-4 font-medium transition text-base tracking-wide relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-white">标准研制</a>
+                    
                     <a href="research.html" class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition text-base tracking-wide">技术研究</a>
+                    
                     <div class="relative group h-full">
                         <button class="nav-item text-blue-100 hover:text-white px-6 py-4 font-medium transition flex items-center h-full text-base tracking-wide">
                             更多 <i class="fa-solid fa-angle-down ml-2 text-xs opacity-70"></i>
@@ -135,7 +150,7 @@
                 <span class="mx-2 text-gray-300">/</span>
                 <a href="standards.html" class="hover:text-[#004098] transition">标准研制</a>
                 <span class="mx-2 text-gray-300">/</span>
-                <span class="text-gray-800 font-medium">标准详情</span>
+                <span class="text-gray-800 font-medium">详情</span>
             </div>
         </div>
     </div>
@@ -166,7 +181,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-600 bg-gray-50 p-5 rounded border border-gray-100">
                     <div class="flex items-center"><i class="fa-regular fa-calendar-check mr-2 text-[#004098]"></i><span class="font-bold mr-2">发布日期：</span> <span id="std-publish-date">-</span></div>
                     <div class="flex items-center"><i class="fa-regular fa-calendar-plus mr-2 text-[#004098]"></i><span class="font-bold mr-2">实施日期：</span> <span id="std-implement-date">-</span></div>
-                    <div class="flex items-center"><i class="fa-solid fa-building-columns mr-2 text-[#004098]"></i><span class="font-bold mr-2">主管部门：</span> <span id="std-dept">相关单位</span></div>
+                    <div class="flex items-center"><i class="fa-solid fa-building-columns mr-2 text-[#004098]"></i><span class="font-bold mr-2">主管部门：</span> <span id="std-dept">-</span></div>
                 </div>
             </div>
 
@@ -183,12 +198,46 @@
                     </div>
                     
                     <div>
-                        <h3 class="font-bold text-[#333] border-l-4 border-[#004098] pl-3 mb-4 text-lg">文件预览</h3>
-                        <!-- 如果有PDF显示iframe，否则显示占位符 -->
-                        <div id="pdf-preview-container" class="w-full h-[500px] bg-gray-100 border border-gray-200 rounded flex flex-col items-center justify-center text-gray-400">
-                            <!-- 默认占位 -->
+                        <div class="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+                            <h3 class="font-bold text-[#333] border-l-4 border-[#004098] pl-3 text-lg">文件预览</h3>
+                            <span class="text-xs text-gray-400" id="preview-status-text">在线预览模式 (Canvas渲染)</span>
+                        </div>
+
+                        <!-- 优化后的预览容器 (高度设为 1100px) -->
+                        <div id="pdf-viewer-container" class="w-full bg-gray-100 border border-gray-300 rounded overflow-hidden flex flex-col hidden relative">
+                            <!-- 工具栏 -->
+                            <div class="bg-gray-100 border-b border-gray-300 p-2 flex flex-wrap items-center justify-between gap-2 shadow-sm z-10 sticky top-0">
+                                <!-- 翻页 -->
+                                <div class="flex items-center gap-1">
+                                    <button id="pdf-prev" class="pdf-btn" title="上一页"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <span class="text-xs font-mono mx-2">
+                                        <span id="pdf-page-num" class="font-bold">1</span> / <span id="pdf-page-count">--</span>
+                                    </span>
+                                    <button id="pdf-next" class="pdf-btn" title="下一页"><i class="fa-solid fa-chevron-right"></i></button>
+                                </div>
+                                <!-- 缩放/旋转 -->
+                                <div class="flex items-center gap-1">
+                                    <button id="pdf-zoom-out" class="pdf-btn" title="缩小"><i class="fa-solid fa-minus"></i></button>
+                                    <button id="pdf-zoom-in" class="pdf-btn" title="放大"><i class="fa-solid fa-plus"></i></button>
+                                    <div class="w-px h-4 bg-gray-300 mx-1"></div>
+                                    <button id="pdf-rotate" class="pdf-btn" title="旋转"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Canvas 区域 (高度设为 1100px 确保显示一整页 A4) -->
+                            <div class="flex-1 overflow-auto bg-[#525659] p-4 flex justify-center h-[1100px] relative" id="canvas-wrapper">
+                                <canvas id="the-canvas" class="shadow-lg origin-top transition-transform duration-200"></canvas>
+                                <!-- 加载中 Spinner -->
+                                <div id="pdf-loading-spinner" class="absolute inset-0 flex items-center justify-center bg-gray-100/50 z-20">
+                                    <i class="fa-solid fa-spinner fa-spin text-4xl text-[#004098]"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 缺省/错误状态 -->
+                        <div id="pdf-placeholder" class="w-full h-[600px] bg-gray-50 border border-gray-200 rounded flex flex-col items-center justify-center text-gray-400 hidden">
                             <i class="fa-regular fa-file-pdf text-5xl mb-4 text-gray-300"></i>
-                            <p>暂无预览文件</p>
+                            <p id="pdf-msg">暂无文件预览</p>
                         </div>
                     </div>
                 </div>
@@ -201,18 +250,20 @@
                         <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-100 rounded-full opacity-50 group-hover:scale-110 transition"></div>
                         <h3 class="font-bold text-[#004098] mb-4 text-lg relative z-10">获取标准全文</h3>
                         
-                        <div id="download-section">
+                        <!-- 允许下载 -->
+                        <div id="download-section" class="hidden">
                             <a id="download-btn" href="#" target="_blank" class="block w-full bg-[#004098] hover:bg-[#003380] text-white py-3 rounded font-bold transition mb-3 flex items-center justify-center shadow-md">
                                 <i class="fa-solid fa-download mr-2"></i> 下载 PDF 文件
                             </a>
                             <p class="text-xs text-gray-500 text-center">点击下载完整版标准文件</p>
                         </div>
                         
+                        <!-- 禁止下载 -->
                         <div id="no-download-section" class="hidden">
-                            <button disabled class="w-full bg-gray-300 text-gray-500 py-3 rounded font-bold cursor-not-allowed flex items-center justify-center">
-                                <i class="fa-solid fa-ban mr-2"></i> 暂无电子版
+                            <button disabled class="w-full bg-gray-300 text-gray-500 py-3 rounded font-bold cursor-not-allowed flex items-center justify-center border border-gray-300">
+                                <i class="fa-solid fa-lock mr-2"></i> 暂无下载权限
                             </button>
-                            <p class="text-xs text-gray-500 text-center mt-2">该标准文件暂未上传或不可公开下载</p>
+                            <p class="text-xs text-gray-500 text-center mt-2">该文档暂未开放下载</p>
                         </div>
                     </div>
 
@@ -225,29 +276,30 @@
                         </a>
                     </div>
 
-                    <!-- 提示信息
-                    <div class="bg-yellow-50 p-4 rounded border border-yellow-100 text-xs text-yellow-700">
-                        <p><i class="fa-solid fa-circle-info mr-1"></i> <strong>提示：</strong> 本平台提供的标准文本仅供参考，请以正式出版物为准。</p>
-                    </div> -->
-
                 </div>
-
             </div>
         </div>
-
     </main>
 
-    <!-- ================= 4. 页脚 (与 Index 完全一致) ================= -->
+    <!-- ================= 4. 页脚 (严格与 Index 一致) ================= -->
     <footer class="bg-[#1e293b] text-gray-400 pt-12 pb-8 mt-auto border-t-4 border-[#004098]">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
                 <div class="col-span-1 md:col-span-2">
                     <h4 class="text-white font-bold text-lg mb-5 border-l-4 border-[#004098] pl-3">相关部门链接</h4>
                     <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
-                        <a href="https://www.samr.gov.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局</a>
-                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局缺陷产品召回技术中心</a>
-                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中国检验认证集团</a>
-                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition"><i class="fa-solid fa-link mr-2 text-gray-600"></i>中国汽车工程研究院股份有限公司</a>
+                        <a href="https://www.samr.gov.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局
+                        </a>
+                        <a href="https://www.samrdprc.org.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>国家市场监督管理总局缺陷产品召回技术中心
+                        </a>
+                        <a href="https://www.ccic.com/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国检验认证集团
+                        </a>
+                        <a href="https://www.caeri.com.cn/" target="_blank" class="hover:text-white hover:underline flex items-center transition">
+                            <i class="fa-solid fa-link mr-2 text-gray-600"></i>中国汽车工程研究院股份有限公司
+                        </a>
                     </div>
                 </div>
                 <div class="col-span-1 md:col-span-1">
@@ -261,8 +313,15 @@
                 <div class="col-span-1 md:col-span-1 flex flex-col items-center md:items-start">
                     <h4 class="text-white font-bold text-lg mb-5">关注我们</h4>
                     <div class="flex items-center gap-4">
-                        <div class="bg-white p-1.5 rounded-lg shadow-lg"><img src="figure/QRcode.jpg" alt="微信公众号" class="w-20 h-20"></div>
-                        <div class="text-xs text-gray-400"><p class="mb-1 text-white font-bold">官方微信</p><p>扫一扫了解更多</p><p>行业动态</p></div>
+                        <div class="bg-white p-1.5 rounded-lg shadow-lg">
+                            <img src="figure/QRcode.jpg" 
+                                 alt="微信公众号" class="w-20 h-20">
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <p class="mb-1 text-white font-bold">官方微信</p>
+                            <p>扫一扫了解更多</p>
+                            <p>行业动态</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -275,6 +334,19 @@
     <!-- 逻辑脚本 -->
     <script type="module">
         import { getItemById } from './js/api.js';
+        
+        // 设置 PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let pdfDoc = null;
+        let pageNum = 1;
+        let pageRendering = false;
+        let pageNumPending = null;
+        let scale = 1.0; 
+        let rotation = 0;
+        const canvas = document.getElementById('the-canvas');
+        const ctx = canvas.getContext('2d');
+        const loadingSpinner = document.getElementById('pdf-loading-spinner');
 
         document.addEventListener('DOMContentLoaded', async function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -286,14 +358,10 @@
             }
 
             try {
-                // 从数据库获取数据
                 const item = await getItemById('standards', id);
 
                 if (item) {
-                    // 更新页面标题
                     document.title = `${item.code} 标准详情 - 技术创新中心`;
-                    
-                    // 填充基本信息
                     document.getElementById('std-code').innerText = item.code || '未编号';
                     document.getElementById('std-title').innerText = item.title || '无标题';
                     document.getElementById('std-publish-date').innerText = item.publish_date || '待定';
@@ -301,11 +369,9 @@
                     document.getElementById('std-dept').innerText = item.department || '相关主管部门';
                     document.getElementById('std-desc').innerText = item.description || '暂无详细描述...';
 
-                    // 类型标签
                     const typeMap = { 'GB': '国家标准', 'QC': '行业标准', 'DB': '地方标准', 'T': '团体标准', 'other': '其他' };
                     document.getElementById('std-type-tag').innerText = typeMap[item.type] || item.type;
 
-                    // 状态 Badge
                     const statusBadge = document.getElementById('std-status');
                     const statusConfig = {
                         'active': { text: '现行', class: 'badge-active' },
@@ -317,26 +383,48 @@
                     statusBadge.innerText = config.text;
                     statusBadge.className = `px-3 py-1 rounded text-sm font-bold ${config.class}`;
 
-                    // PDF 下载与预览逻辑
+                    // ==========================================
+                    // 权限与预览逻辑
+                    // ==========================================
+                    const downloadSection = document.getElementById('download-section');
+                    const noDownloadSection = document.getElementById('no-download-section');
+                    const pdfContainer = document.getElementById('pdf-viewer-container');
+                    const placeholder = document.getElementById('pdf-placeholder');
+                    const downloadBtn = document.getElementById('download-btn');
+
+                    // 1. 预览逻辑 (只要有文件，始终初始化预览)
                     if (item.pdf_url) {
-                        // 启用下载按钮
-                        document.getElementById('download-btn').href = item.pdf_url;
-                        
-                        // 尝试在 iframe 中预览 PDF (浏览器原生支持)
-                        // 注意：如果跨域策略限制，iframe 可能无法加载，此时仅保留下载按钮
-                        const container = document.getElementById('pdf-preview-container');
-                        container.innerHTML = `
-                            <iframe src="${item.pdf_url}" class="w-full h-full rounded border-none">
-                                <p>您的浏览器不支持 PDF 预览，请下载查看。</p>
-                            </iframe>
-                        `;
+                        pdfContainer.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+                        initPDFViewer(item.pdf_url); // 初始化 PDF.js
                     } else {
-                        // 无文件状态
-                        document.getElementById('download-section').classList.add('hidden');
-                        document.getElementById('no-download-section').classList.remove('hidden');
+                        pdfContainer.classList.add('hidden');
+                        placeholder.classList.remove('hidden');
                     }
 
-                    // 显示内容区域
+                    // 2. 下载逻辑
+                    if (item.pdf_url) {
+                        if (item.allow_download !== false) {
+                            downloadSection.classList.remove('hidden');
+                            noDownloadSection.classList.add('hidden');
+                            downloadBtn.href = item.pdf_url;
+                        } else {
+                            downloadSection.classList.add('hidden');
+                            noDownloadSection.classList.remove('hidden');
+                            const btn = noDownloadSection.querySelector('button');
+                            const msg = noDownloadSection.querySelector('p');
+                            btn.innerHTML = '<i class="fa-solid fa-lock mr-2"></i> 暂无下载权限';
+                            msg.innerText = "暂不支持该文档下载";
+                        }
+                    } else {
+                        downloadSection.classList.add('hidden');
+                        noDownloadSection.classList.remove('hidden');
+                        const btn = noDownloadSection.querySelector('button');
+                        const msg = noDownloadSection.querySelector('p');
+                        btn.innerHTML = '<i class="fa-solid fa-upload mr-2"></i> 暂无电子版';
+                        msg.innerText = "该标准文件暂未上传";
+                    }
+
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('content-area').classList.remove('hidden');
                 } else {
@@ -347,6 +435,121 @@
                 document.getElementById('loading').innerHTML = '数据加载失败，请检查网络连接';
             }
         });
+
+        // ================= PDF.js 渲染函数 =================
+        async function initPDFViewer(url) {
+            try {
+                // 加载文档
+                const loadingTask = pdfjsLib.getDocument(url);
+                pdfDoc = await loadingTask.promise;
+                
+                document.getElementById('pdf-page-count').textContent = pdfDoc.numPages;
+                
+                // 渲染第一页
+                renderPage(pageNum);
+                
+                // 绑定按钮事件
+                document.getElementById('pdf-prev').addEventListener('click', onPrevPage);
+                document.getElementById('pdf-next').addEventListener('click', onNextPage);
+                document.getElementById('pdf-zoom-in').addEventListener('click', onZoomIn);
+                document.getElementById('pdf-zoom-out').addEventListener('click', onZoomOut);
+                document.getElementById('pdf-rotate').addEventListener('click', onRotate);
+
+            } catch (error) {
+                console.error('PDF加载失败:', error);
+                loadingSpinner.innerHTML = `<span class="text-red-500">PDF 加载失败</span>`;
+            }
+        }
+
+        function renderPage(num) {
+            pageRendering = true;
+            loadingSpinner.classList.remove('hidden');
+
+            pdfDoc.getPage(num).then(function(page) {
+                // 计算自适应缩放：默认宽度撑满容器
+                const wrapper = document.getElementById('canvas-wrapper');
+                // 获取无缩放时的视口
+                const unscaledViewport = page.getViewport({scale: 1, rotation: rotation});
+                // 容器宽度减去内边距 (p-4 = 32px)
+                const containerWidth = wrapper.clientWidth - 40; 
+                
+                // 如果是初始加载(scale=1.0)，自动计算适应宽度，否则使用当前scale
+                let currentScale = scale;
+                if(scale === 1.0) {
+                     currentScale = containerWidth / unscaledViewport.width;
+                     // 限制最大初始缩放，防止在大屏上过大
+                     if(currentScale > 1.5) currentScale = 1.5;
+                     scale = currentScale; // 更新全局scale
+                }
+
+                const viewport = page.getViewport({scale: scale, rotation: rotation});
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    loadingSpinner.classList.add('hidden');
+                    
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+
+            document.getElementById('pdf-page-num').textContent = num;
+            updateButtons();
+        }
+
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        function onPrevPage() {
+            if (pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+
+        function onZoomIn() {
+            scale += 0.2;
+            queueRenderPage(pageNum);
+        }
+
+        function onZoomOut() {
+            if (scale <= 0.4) return;
+            scale -= 0.2;
+            queueRenderPage(pageNum);
+        }
+        
+        function onRotate() {
+            rotation += 90;
+            if (rotation === 360) rotation = 0;
+            queueRenderPage(pageNum);
+        }
+
+        function updateButtons() {
+            document.getElementById('pdf-prev').disabled = pageNum <= 1;
+            document.getElementById('pdf-next').disabled = pageNum >= pdfDoc.numPages;
+        }
     </script>
     <!-- 引入 Search 逻辑 -->
     <script type="module" src="js/search.js"></script>
