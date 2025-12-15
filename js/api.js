@@ -2,7 +2,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// ⚠️ 请替换为您自己的 Supabase 配置
+// ⚠️ 请替换为您自己的 Supabase 配置 (保持您原有的配置不变)
 const supabaseUrl = 'https://ncvcjlyzbuhzaoruwjba.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jdmNqbHl6YnVoemFvcnV3amJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNDIxNzgsImV4cCI6MjA4MDcxODE3OH0.yn7gsprnzMbK50kaYTwCOu5cgvJtXIKKMvJOIMQGLAA'
 
@@ -38,19 +38,38 @@ export async function checkSession() {
     return session;
 }
 
-// ================= 2. 文件上传 (Storage) =================
+// ================= 2. 文件上传 (Storage) - 修复版 =================
 
-export async function uploadImage(file) {
+/**
+ * 通用文件上传函数
+ * @param {File} file - 文件对象
+ * @param {string} bucketName - 存储桶名称 (如 'news-images', 'activity-files')
+ */
+export async function uploadFile(file, bucketName) {
     if (!supabase) throw new Error("数据库未连接");
     
     const fileExt = file.name.split('.').pop();
+    // 生成防重名文件名
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${fileExt}`;
     
-    const { error } = await supabase.storage.from('news-images').upload(fileName, file);
-    if (error) throw error;
+    // 上传到指定 Bucket
+    const { error } = await supabase.storage.from(bucketName).upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+    });
 
-    const { data } = supabase.storage.from('news-images').getPublicUrl(fileName);
+    if (error) {
+        console.error(`上传到 ${bucketName} 失败:`, error);
+        throw error;
+    }
+
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(fileName);
     return data.publicUrl;
+}
+
+// 兼容旧代码的图片上传 (默认到 news-images)
+export async function uploadImage(file) {
+    return await uploadFile(file, 'news-images');
 }
 
 // ================= 3. 通用 CRUD (数据库操作) =================
@@ -126,11 +145,10 @@ export async function getArticles(limit = 10, category = '') {
     return data || [];
 }
 
-// [新闻] 获取单篇文章并增加浏览量
+// [新闻] 获取单篇文章
 export async function getArticleById(id) {
     if (!supabase) return null;
     
-    // 先获取文章
     const { data, error } = await supabase
         .from('articles')
         .select('*')
@@ -141,28 +159,9 @@ export async function getArticleById(id) {
     return data;
 }
 
-// [新闻] 增加浏览量（静默执行，不等待结果）
+// [新闻] 增加浏览量
 export async function incrementViews(id) {
     if (!supabase) return;
-    
-    // 异步执行，不阻塞页面
     supabase.rpc('increment_views', { article_id: id })
         .catch(err => console.warn('更新浏览量失败:', err));
-}
-
-// --- 在 js/api.js 中添加或修改 ---
-
-// 通用文件上传 (支持图片和文档)
-export async function uploadFile(file, bucket = 'news-images') {
-    if (!supabase) throw new Error("数据库未连接");
-    
-    // 生成唯一文件名，保留后缀
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${fileExt}`;
-    
-    const { error } = await supabase.storage.from(bucket).upload(fileName, file);
-    if (error) throw error;
-
-    const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
-    return data.publicUrl;
 }

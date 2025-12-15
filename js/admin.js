@@ -6,6 +6,7 @@ import {
     logout, 
     checkSession, 
     uploadImage, 
+    uploadFile, // <--- 新增导入
     addItem, 
     updateItem, 
     deleteItem, 
@@ -14,17 +15,15 @@ import {
 } from './api.js';
 
 let quillNews;
-let quillAct; // 活动详情编辑器实例
+let quillAct; 
 
 // =================== 1. 初始化 ===================
 document.addEventListener('DOMContentLoaded', async () => {
     // 1.1 鉴权检查
     const session = await checkSession();
     if (!session) {
-        // 未登录：显示登录弹窗
         document.getElementById('login-modal').classList.remove('hidden');
     } else {
-        // 已登录：显示主界面
         document.getElementById('login-modal').classList.add('hidden');
         document.getElementById('sidebar').classList.remove('hidden');
         document.getElementById('main-content').classList.remove('hidden');
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (session.user && session.user.email) {
             document.getElementById('currentUser').innerText = session.user.email;
         }
-        initAdmin(); // 初始化后台逻辑
+        initAdmin(); 
     }
 
     // 1.2 绑定登录表单
@@ -70,7 +69,7 @@ async function initAdmin() {
         });
     }
 
-    // 2.2 初始化活动详情编辑器 (如果存在)
+    // 2.2 初始化活动详情编辑器
     if (document.getElementById('act-editor-container')) {
         quillAct = new Quill('#act-editor-container', {
             theme: 'snow',
@@ -83,21 +82,17 @@ async function initAdmin() {
     loadNews();
     loadActs();
     loadProjs();
-    loadStds(); // 加载标准列表
+    loadStds();
 
-    // 2.4 配置自动保存 (Auto-Save)
-    // 新闻
+    // 2.4 配置自动保存
     initAutoSave('news', ['newsTitle', 'newsCategory', 'newsSource', 'newsAuthor', 'newsPublishDate', 'newsSummary'], 
         () => quillNews ? quillNews.root.innerHTML : '');
     
-    // 活动 (包含新增字段)
     initAutoSave('act', ['actTitle', 'actCategory', 'actDate', 'actLoc', 'actSummary', 'actOrganizer', 'actContractor', 'actContact'], 
         () => quillAct ? quillAct.root.innerHTML : '');
     
-    // 课题
     initAutoSave('proj', ['projName', 'projType', 'projStage', 'projRole', 'projContent']);
     
-    // 标准
     initAutoSave('std', ['stdCode', 'stdTitle', 'stdType', 'stdStatus', 'stdPublishDate', 'stdImplementDate', 'stdDepartment', 'stdDescription']);
 
     // 2.5 绑定表单提交事件
@@ -113,7 +108,7 @@ async function initAdmin() {
     document.getElementById('searchStd').oninput = debounce(() => loadStds());
 }
 
-// =================== 3. 表单数据获取 (关键部分) ===================
+// =================== 3. 表单数据获取 ===================
 
 // [新闻数据]
 const getNewsData = async () => {
@@ -122,27 +117,54 @@ const getNewsData = async () => {
     return {
         title: document.getElementById('newsTitle').value,
         category: document.getElementById('newsCategory').value,
-        source: document.getElementById('newsSource').value,        // 来源
-        author: document.getElementById('newsAuthor').value,        // 作者
-        publish_date: document.getElementById('newsPublishDate').value, // 发布日期
+        source: document.getElementById('newsSource').value,
+        author: document.getElementById('newsAuthor').value,
+        publish_date: document.getElementById('newsPublishDate').value,
         summary: document.getElementById('newsSummary').value,
         content: quillNews ? quillNews.root.innerHTML : '',
-        ...(imageUrl && { image_url: imageUrl }) // 仅当上传新图时更新
+        ...(imageUrl && { image_url: imageUrl }) 
     };
 };
 
-// [活动数据]
+// [活动数据] - 核心修复：上传 Bucket 和 字段名
 const getActData = async () => {
     const imgFile = document.getElementById('actImg').files[0];
     const docFile = document.getElementById('actFile').files[0];
     
-    // 分别上传图片和文档 (复用 uploadImage，实际应区分 bucket，但在简单场景下共用也可)
-    const imageUrl = imgFile ? await uploadImage(imgFile) : null;
-    const fileUrl = docFile ? await uploadImage(docFile) : null; 
+    const submitBtn = document.querySelector('#actForm button[type="submit"]');
+    const originalText = submitBtn.innerText;
 
+    let imageUrl = null;
+    let attachUrl = null;
+
+    // 1. 上传封面图 -> news-images
+    if (imgFile) {
+        try {
+            submitBtn.innerText = "上传图片中...";
+            imageUrl = await uploadFile(imgFile, 'news-images');
+        } catch (e) {
+            alert("封面图上传失败: " + e.message);
+            throw e; 
+        }
+    }
+
+    // 2. 上传附件 -> activity-files
+    if (docFile) {
+        try {
+            submitBtn.innerText = "上传附件中...";
+            attachUrl = await uploadFile(docFile, 'activity-files');
+        } catch (e) {
+            alert("附件上传失败 (请检查 activity-files 存储桶权限): " + e.message);
+            throw e;
+        }
+    }
+
+    submitBtn.innerText = originalText;
+
+    // 3. 构建数据对象
     return {
         title: document.getElementById('actTitle').value,
-        category: document.getElementById('actCategory').value,     // 赛事类型
+        category: document.getElementById('actCategory').value,
         date_range: document.getElementById('actDate').value,
         location: document.getElementById('actLoc').value,
         summary: document.getElementById('actSummary').value,
@@ -151,11 +173,15 @@ const getActData = async () => {
         contractor: document.getElementById('actContractor').value || '中国汽车工程研究院股份有限公司',
         contact: document.getElementById('actContact').value,
         
-        timeline: getTimelineFromDOM(), // 获取动态时间线数据
+        // 时间线数据
+        timeline: getTimelineFromDOM(), 
+        // 富文本
         content: quillAct ? quillAct.root.innerHTML : '',
         
+        // 仅当上传新文件时更新 URL
         ...(imageUrl && { image_url: imageUrl }),
-        ...(fileUrl && { file_url: fileUrl })   // 更新附件链接
+        // ⚠️ 修正：数据库字段是 attachment_url
+        ...(attachUrl && { attachment_url: attachUrl })   
     };
 };
 
@@ -171,6 +197,9 @@ const getProjData = async () => ({
 // [标准数据]
 const getStdData = async () => {
     const file = document.getElementById('stdPdf').files[0];
+    // 标准建议也使用 uploadFile 上传到 standards-pdf，但为了兼容暂时用 uploadImage(news-images) 或者按需修改
+    // 这里如果 standards-pdf 桶存在，建议使用: await uploadFile(file, 'standards-pdf');
+    // 目前保持原样以免出错，如果需要请手动修改 'news-images' 为 'standards-pdf'
     const pdfUrl = (file && !document.getElementById('noPdfUpload')?.checked) ? await uploadImage(file) : null;
     
     return {
@@ -182,12 +211,12 @@ const getStdData = async () => {
         implement_date: document.getElementById('stdImplementDate').value || null,
         department: document.getElementById('stdDepartment').value,
         description: document.getElementById('stdDescription').value,
-        allow_download: document.getElementById('stdAllowDownload').checked, // 权限开关状态
+        allow_download: document.getElementById('stdAllowDownload').checked,
         ...(pdfUrl && { pdf_url: pdfUrl })
     };
 };
 
-// 通用表单提交绑定逻辑
+// 通用表单提交绑定
 function bindSubmit(formId, table, dataFn, reloadFn, prefix) {
     const form = document.getElementById(formId);
     if (!form) return;
@@ -202,24 +231,22 @@ function bindSubmit(formId, table, dataFn, reloadFn, prefix) {
         btn.disabled = true;
 
         try {
-            const data = await dataFn(); // 获取整理好的数据对象
+            const data = await dataFn();
             
             if (id) {
-                // 修改模式
                 await updateItem(table, id, data);
                 alert("修改成功");
             } else {
-                // 新增模式
                 await addItem(table, data);
                 alert("发布成功");
             }
             
-            // 成功后操作：清除草稿、重置表单、刷新列表
             clearDraft(prefix);
             cancelEdit(prefix); 
-            reloadFn();
+            reloadFn(); // 刷新列表
 
         } catch (err) {
+            console.error(err);
             alert("操作失败: " + err.message);
         } finally {
             btn.innerText = oldText; 
@@ -234,7 +261,7 @@ function bindSubmit(formId, table, dataFn, reloadFn, prefix) {
 window.loadNews = async () => {
     const keyword = document.getElementById('searchNews').value;
     const list = document.getElementById('newsList');
-    const data = await getList('articles', keyword, ['title']); // 仅搜索标题
+    const data = await getList('articles', keyword, ['title']); 
     
     list.innerHTML = data.length ? data.map(item => `
         <li class="flex justify-between items-center p-3 border rounded hover:bg-gray-50">
@@ -330,7 +357,6 @@ window.delItem = async (table, id, reloadFn) => {
 };
 
 window.editItem = async (prefix, id) => {
-    // 切换界面状态
     document.getElementById(`${prefix}FormTitle`).innerText = "编辑模式";
     document.getElementById(`${prefix}CancelBtn`).classList.remove('hidden');
     document.getElementById(`${prefix}DraftTip`).classList.add('hidden'); 
@@ -341,10 +367,8 @@ window.editItem = async (prefix, id) => {
         const data = await getItemById(map[prefix], id);
         if(!data) return alert("数据不存在");
 
-        // 填充 ID
         document.getElementById(`${prefix}Id`).value = data.id;
 
-        // 填充字段
         if (prefix === 'news') {
             document.getElementById('newsTitle').value = data.title;
             document.getElementById('newsCategory').value = data.category;
@@ -365,7 +389,7 @@ window.editItem = async (prefix, id) => {
             document.getElementById('actContact').value = data.contact || '';
             
             // 回显时间线
-            renderTimelineToDOM(data.timeline);
+            renderTimelineToDOM(data.timeline || []);
             
             if (quillAct) quillAct.root.innerHTML = data.content || ''; 
         } 
@@ -385,11 +409,9 @@ window.editItem = async (prefix, id) => {
             document.getElementById('stdImplementDate').value = data.implement_date || '';
             document.getElementById('stdDepartment').value = data.department || '';
             document.getElementById('stdDescription').value = data.description || '';
-            // 回显权限开关
-            document.getElementById('stdAllowDownload').checked = data.allow_download !== false; // 默认为 true
+            document.getElementById('stdAllowDownload').checked = data.allow_download !== false;
         }
 
-        // 滚动到表单
         document.getElementById(`${prefix}Form`).scrollIntoView({ behavior: 'smooth' });
 
     } catch (e) { alert("读取数据失败: " + e.message); }
@@ -401,15 +423,13 @@ window.cancelEdit = (prefix) => {
     document.getElementById(`${prefix}CancelBtn`).classList.add('hidden');
     document.getElementById(`${prefix}FormTitle`).innerText = "新增";
     
-    // 清空特殊组件
     if (prefix === 'news' && quillNews) quillNews.setContents([]);
     if (prefix === 'act') {
-        document.getElementById('timeline-container').innerHTML = ''; // 清空时间线
+        document.getElementById('timeline-container').innerHTML = ''; 
         if(quillAct) quillAct.setContents([]);
     }
-    if (prefix === 'std') document.getElementById('stdAllowDownload').checked = true; // 默认勾选
+    if (prefix === 'std') document.getElementById('stdAllowDownload').checked = true;
 
-    // 尝试恢复暂存
     restoreDraft(prefix);
 };
 
@@ -427,7 +447,7 @@ window.addTimelineRow = (date = '', event = '') => {
     document.getElementById('timeline-container').appendChild(div);
 };
 
-// [活动] 获取时间线数据
+// [活动] 获取时间线数据 (返回数组)
 function getTimelineFromDOM() {
     const rows = document.querySelectorAll('.timeline-row');
     const timeline = [];
@@ -450,10 +470,10 @@ function renderTimelineToDOM(timelineData) {
     }
 }
 
-// [通用] 自动暂存逻辑
+// [通用] 自动暂存
 function initAutoSave(prefix, fields, contentFn) {
     const save = debounce(() => {
-        if(document.getElementById(`${prefix}Id`).value) return; // 编辑模式不暂存
+        if(document.getElementById(`${prefix}Id`).value) return; 
         
         const data = {};
         fields.forEach(f => {
@@ -471,7 +491,6 @@ function initAutoSave(prefix, fields, contentFn) {
         if(el) el.addEventListener('input', save);
     });
     
-    // 监听 Quill 变化
     if(prefix === 'news' && quillNews) quillNews.on('text-change', save);
     if(prefix === 'act' && quillAct) quillAct.on('text-change', save);
     
@@ -497,13 +516,11 @@ function restoreDraft(prefix) {
     } catch(e) {}
 }
 
-// [通用] 清除暂存
 function clearDraft(prefix) {
     localStorage.removeItem(`draft_${prefix}`);
     document.getElementById(`${prefix}DraftTip`).classList.add('hidden');
 }
 
-// [通用] 防抖函数
 function debounce(func, wait = 500) {
     let timeout;
     return function (...args) { 
