@@ -7,12 +7,86 @@
     <title>后台管理</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 Quill CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <style> .active-nav { background-color: #1e293b; border-left: 4px solid #3b82f6; color: white !important; } </style>
+    <style> 
+        .active-nav { background-color: #1e293b; border-left: 4px solid #3b82f6; color: white !important; } 
+        
+        /* --- 编辑器 UI 优化 (固定高度+滚动) --- */
+        /* 工具栏吸顶 */
+        .ql-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 20; 
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        /* 通用编辑器容器样式 (新闻 & 活动) */
+        #act-editor-container, #editor-container {
+            height: 600px !important; 
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border: 1px solid #d1d5db;
+        }
+
+        /* 编辑器内部滚动条 */
+        .ql-editor {
+            height: 100%;
+            overflow-y: auto;
+            font-size: 16px;
+            font-family: "Microsoft YaHei", sans-serif;
+            padding: 20px;
+        }
+        
+        /* 优化编辑器内图片显示 */
+        .ql-editor img { max-width: 100%; height: auto; }
+
+        /* --- Quill 汉化与字体定制 (WPS 风格) --- */
+        /* 字体映射 */
+        .ql-font-simsun { font-family: "SimSun"; }
+        .ql-font-simhei { font-family: "SimHei"; }
+        .ql-font-kaiti { font-family: "KaiTi"; }
+        .ql-font-fangsong { font-family: "FangSong"; }
+        .ql-font-microsoft-yahei { font-family: "Microsoft YaHei"; }
+
+        /* 工具栏下拉菜单汉化 - 字体 */
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="simsun"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="simsun"]::before { content: "宋体"; font-family: "SimSun"; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="simhei"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="simhei"]::before { content: "黑体"; font-family: "SimHei"; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="microsoft-yahei"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="microsoft-yahei"]::before { content: "微软雅黑"; font-family: "Microsoft YaHei"; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="kaiti"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="kaiti"]::before { content: "楷体"; font-family: "KaiTi"; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="fangsong"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="fangsong"]::before { content: "仿宋"; font-family: "FangSong"; }
+
+        /* 工具栏下拉菜单汉化 - 字号 */
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before { content: "小四 (12px)"; }
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before { content: "四号 (14px)"; }
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before { content: "三号 (16px) - 默认"; }
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before { content: "小二 (18px)"; }
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before { content: "二号 (20px)"; }
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="24px"]::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before { content: "小一 (24px)"; }
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="30px"]::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="30px"]::before { content: "一号 (30px)"; }
+    </style>
 </head>
 <body class="bg-gray-100 h-screen flex overflow-hidden font-sans text-gray-800">
 
-    <!-- 登录 -->
+    <!-- 登录弹窗 -->
     <div id="login-modal" class="fixed inset-0 bg-[#001540] z-50 flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-2xl w-96 text-center">
             <h2 class="text-2xl font-bold mb-6">管理员登录</h2>
@@ -62,12 +136,36 @@
                     </div>
                     <textarea id="newsSummary" placeholder="摘要" class="w-full border p-2 rounded h-20"></textarea>
                     
+                    <!-- 新闻封面图 (支持 URL 优先) -->
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">封面图片</label>
-                        <input type="file" id="newsCover" accept="image/*" class="text-sm">
+                        <!-- URL 输入框 -->
+                        <input type="text" id="newsCoverUrl" placeholder="图片链接 (https://...)，与下方“选择文件”二选一即可" class="w-full border p-2 rounded text-sm mb-2 bg-gray-50 focus:bg-white transition" title="如有链接，优先使用此链接">
+                        
+                        <div class="flex items-center gap-4">
+                            <!-- 文件上传 -->
+                            <input type="file" id="newsCover" accept="image/*" class="text-sm flex-1" onchange="previewImage(this, 'newsCoverPreview')">
+                            <!-- 预览图容器 -->
+                            <div id="newsCoverPreviewBox" class="hidden h-16 w-24 border rounded overflow-hidden bg-gray-100 relative group">
+                                <img id="newsCoverPreview" src="" class="w-full h-full object-cover">
+                                <a href="#" target="_blank" id="newsCoverLink" class="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 text-xs transition">查看</a>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">提示：若“图片链接”框内有值，将忽略文件上传。</p>
                     </div>
 
-                    <div id="editor-container" class="h-64 bg-white"></div>
+                    <!-- 新闻正文编辑器 (升级为 WPS 风格) -->
+                    <div class="mt-4">
+                        <div class="flex justify-between items-end mb-2">
+                            <label class="block text-sm font-bold text-gray-700">新闻正文</label>
+                            <!-- 一键排版按钮 -->
+                            <button type="button" onclick="formatContentImages('news')" class="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-200 transition flex items-center shadow-sm">
+                                <i class="fa-solid fa-images mr-1.5"></i> 一键统一图片宽度(100%)
+                            </button>
+                        </div>
+                        <div id="editor-container"></div>
+                    </div>
+
                     <div class="flex gap-4 pt-4">
                         <button type="submit" class="bg-[#004098] text-white px-6 py-2 rounded">提交</button>
                         <button type="button" onclick="cancelEdit('news')" id="newsCancelBtn" class="bg-gray-300 px-6 py-2 rounded hidden">撤销</button>
@@ -117,13 +215,34 @@
                         </div>
                     </div>
 
+                    <!-- 活动封面图片 (支持 URL 优先) -->
                     <div class="col-span-1">
                         <label class="block text-xs text-gray-500 mb-1">封面图片</label>
-                        <input type="file" id="actImg" accept="image/*" class="text-sm w-full">
+                        <!-- URL 输入框 -->
+                        <input type="text" id="actImgUrl" placeholder="图片链接，与下方“选择文件”二选一即可" class="w-full border p-2 rounded text-sm mb-2 bg-gray-50" title="优先使用此链接">
+                        <div class="flex items-center gap-2">
+                            <!-- 文件上传 -->
+                            <input type="file" id="actImg" accept="image/*" class="text-sm w-full" onchange="previewImage(this, 'actImgPreview')">
+                            <!-- 预览 -->
+                            <div id="actImgPreviewBox" class="hidden h-10 w-16 border rounded overflow-hidden flex-shrink-0">
+                                <img id="actImgPreview" src="" class="w-full h-full object-cover">
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- 活动附件文档 (支持 URL 优先) -->
                     <div class="col-span-1">
                         <label class="block text-xs text-gray-500 mb-1">附件文档 (规则/名单PDF)</label>
-                        <input type="file" id="actFile" accept=".pdf,.doc,.docx" class="text-sm w-full">
+                        <!-- URL 输入框 -->
+                        <input type="text" id="actFileUrl" placeholder="文档链接" class="w-full border p-2 rounded text-sm mb-2 bg-gray-50" title="优先使用此链接">
+                        <div class="flex items-center gap-2">
+                            <!-- 文件上传 -->
+                            <input type="file" id="actFile" accept=".pdf,.doc,.docx" class="text-sm w-full">
+                            <!-- 预览链接 -->
+                            <a id="actFilePreviewLink" href="#" target="_blank" class="hidden text-blue-600 hover:text-blue-800 text-sm font-bold px-2 whitespace-nowrap">
+                                <i class="fa-solid fa-file-arrow-down"></i> 查看
+                            </a>
+                        </div>
                     </div>
 
                     <!-- 时间线编辑区域 -->
@@ -138,14 +257,22 @@
                         <p class="text-xs text-gray-400 mt-2">提示：请按时间先后顺序添加，保存后将显示在前端列表页。</p>
                     </div>
 
+                    <!-- 活动详情编辑器 (WPS 风格 + 固定高度) -->
                     <div class="col-span-2 mt-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-2">活动详情 / 赛后回顾 (富文本)</label>
-                        <div id="act-editor-container" class="h-64 bg-white"></div>
+                        <div class="flex justify-between items-end mb-2">
+                            <label class="block text-sm font-bold text-gray-700">活动详情 / 赛后回顾</label>
+                            <!-- 一键排版按钮 -->
+                            <button type="button" onclick="formatContentImages('act')" class="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-200 transition flex items-center shadow-sm">
+                                <i class="fa-solid fa-images mr-1.5"></i> 一键统一图片宽度(100%)
+                            </button>
+                        </div>
+                        <!-- 高度由 CSS #act-editor-container 控制 -->
+                        <div id="act-editor-container"></div>
                     </div>
 
                     <div class="col-span-2 flex gap-4 mt-6">
-                        <button type="submit" class="bg-yellow-600 text-white px-6 py-2 rounded">提交发布</button>
-                        <button type="button" onclick="cancelEdit('act')" id="actCancelBtn" class="bg-gray-300 px-6 py-2 rounded hidden">撤销</button>
+                        <button type="submit" class="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition shadow-md">提交发布</button>
+                        <button type="button" onclick="cancelEdit('act')" id="actCancelBtn" class="bg-gray-300 px-6 py-2 rounded hidden hover:bg-gray-400 transition">撤销</button>
                     </div>
                 </form>
             </div>
@@ -234,18 +361,30 @@
                     <input type="text" id="stdDepartment" placeholder="主管部门" value="国家标准化管理委员会" class="col-span-2 border p-2 rounded">
                     <textarea id="stdDescription" placeholder="标准描述/适用范围" class="col-span-2 border p-2 rounded h-32"></textarea>
                     
+                    <!-- 标准文件区域 -->
                     <div class="col-span-2 space-y-2">
                         <label class="block text-sm font-medium text-gray-700">标准文件 (PDF)</label>
-                        <div class="flex flex-col sm:flex-row gap-3">
+                        
+                        <!-- URL 输入 -->
+                        <input type="text" id="stdPdfUrl" placeholder="PDF 文件链接 (https://...)" class="w-full border p-2 rounded text-sm bg-gray-50">
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 items-center">
                             <input type="file" id="stdPdf" accept=".pdf" class="border p-2 rounded text-sm flex-1">
-                            <div class="flex items-center">
+                            
+                            <!-- 现有预览链接 -->
+                            <a id="stdPdfPreviewLink" href="#" target="_blank" class="hidden text-purple-600 hover:text-purple-800 text-sm font-bold flex items-center">
+                                <i class="fa-regular fa-eye mr-1"></i> 预览现有文件
+                            </a>
+
+                            <div class="flex items-center ml-auto">
                                 <input type="checkbox" id="noPdfUpload" class="mr-2 h-4 w-4">
-                                <label for="noPdfUpload" class="text-sm text-gray-600">不上传文件</label>
+                                <label for="noPdfUpload" class="text-sm text-gray-600">不上传/无文件</label>
                             </div>
                         </div>
+                        <p class="text-xs text-gray-400">逻辑：链接框 > 文件上传 > 不上传。</p>
                     </div>
 
-                    <!-- 【新增】下载权限开关 -->
+                    <!-- 下载权限开关 -->
                     <div class="col-span-2 flex items-center bg-blue-50 p-3 rounded border border-blue-100 mt-2">
                         <input type="checkbox" id="stdAllowDownload" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300" checked>
                         <div class="ml-3 text-sm">
@@ -310,6 +449,22 @@
                 });
             }
         });
+
+        // 本地图片选择后立即预览
+        window.previewImage = function(input, imgId) {
+            const boxId = imgId + 'Box';
+            const img = document.getElementById(imgId);
+            const box = document.getElementById(boxId);
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                    if(box) box.classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
     </script>
 </body>
 </html>
