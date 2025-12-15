@@ -6,7 +6,7 @@ import {
     logout, 
     checkSession, 
     uploadImage, 
-    uploadFile, // <--- 新增导入
+    uploadFile, 
     addItem, 
     updateItem, 
     deleteItem, 
@@ -58,23 +58,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 });
 
+// 1.4 注册 Quill 格式 (字体/字号) - WPS 风格核心
+const registerQuillFormats = () => {
+    const Font = Quill.import('formats/font');
+    // 定义字体白名单 (对应 CSS font-family)
+    Font.whitelist = ['microsoft-yahei', 'simsun', 'simhei', 'kaiti', 'fangsong', 'arial', 'sans-serif'];
+    Quill.register(Font, true);
+
+    const Size = Quill.import('attributors/style/size');
+    // 定义字号白名单
+    Size.whitelist = ['12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px'];
+    Quill.register(Size, true);
+};
+
 // =================== 2. 核心逻辑初始化 ===================
 async function initAdmin() {
-    // 2.1 初始化新闻编辑器
+    registerQuillFormats(); // 调用注册
+
+    // 公共的 WPS 风格工具栏配置
+    const wpsToolbarModules = {
+        toolbar: [
+            // 字体与字号
+            [{ 'font': ['microsoft-yahei', 'simsun', 'simhei', 'kaiti', 'fangsong', 'arial'] }],
+            [{ 'size': ['12px', '14px', '16px', '18px', '20px', '24px', '30px'] }],
+            
+            // 文本样式
+            ['bold', 'italic', 'underline', 'strike'],        
+            [{ 'color': [] }, { 'background': [] }],          
+            
+            // 对齐与缩进
+            [{ 'align': [] }],                                
+            [{ 'indent': '-1'}, { 'indent': '+1' }],          
+            
+            // 标题与列表
+            [{ 'header': [1, 2, 3, false] }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],     
+            
+            // 插入与清除
+            ['blockquote', 'code-block'],
+            ['link', 'image', 'video'], 
+            ['clean']                                         
+        ]
+    };
+
+    // 2.1 初始化新闻编辑器 (升级为 WPS 增强版)
     if (document.getElementById('editor-container')) {
         quillNews = new Quill('#editor-container', {
             theme: 'snow',
-            placeholder: '输入新闻正文...',
-            modules: { toolbar: [['bold', 'italic', 'underline'], [{'list': 'ordered'}, {'list': 'bullet'}], ['link', 'image'], ['clean']] }
+            placeholder: '输入新闻正文 (支持从 Word/WPS/微信公众号 直接粘贴)...',
+            modules: wpsToolbarModules // 使用相同的增强配置
         });
     }
 
-    // 2.2 初始化活动详情编辑器
+    // 2.2 初始化活动详情编辑器 (WPS 增强版)
     if (document.getElementById('act-editor-container')) {
         quillAct = new Quill('#act-editor-container', {
             theme: 'snow',
-            placeholder: '输入活动回顾/详情...',
-            modules: { toolbar: [['bold', 'italic', 'underline'], [{'header': 1}, {'header': 2}], [{'list': 'ordered'}, {'list': 'bullet'}], ['link', 'image'], ['clean']] }
+            placeholder: '请在此输入内容，支持从 Word/WPS/微信公众号 直接粘贴...',
+            modules: wpsToolbarModules
         });
     }
 
@@ -85,15 +126,15 @@ async function initAdmin() {
     loadStds();
 
     // 2.4 配置自动保存
-    initAutoSave('news', ['newsTitle', 'newsCategory', 'newsSource', 'newsAuthor', 'newsPublishDate', 'newsSummary'], 
+    initAutoSave('news', ['newsTitle', 'newsCategory', 'newsSource', 'newsAuthor', 'newsPublishDate', 'newsSummary', 'newsCoverUrl'], 
         () => quillNews ? quillNews.root.innerHTML : '');
     
-    initAutoSave('act', ['actTitle', 'actCategory', 'actDate', 'actLoc', 'actSummary', 'actOrganizer', 'actContractor', 'actContact'], 
+    initAutoSave('act', ['actTitle', 'actCategory', 'actDate', 'actLoc', 'actSummary', 'actOrganizer', 'actContractor', 'actContact', 'actImgUrl', 'actFileUrl'], 
         () => quillAct ? quillAct.root.innerHTML : '');
     
     initAutoSave('proj', ['projName', 'projType', 'projStage', 'projRole', 'projContent']);
     
-    initAutoSave('std', ['stdCode', 'stdTitle', 'stdType', 'stdStatus', 'stdPublishDate', 'stdImplementDate', 'stdDepartment', 'stdDescription']);
+    initAutoSave('std', ['stdCode', 'stdTitle', 'stdType', 'stdStatus', 'stdPublishDate', 'stdImplementDate', 'stdDepartment', 'stdDescription', 'stdPdfUrl']);
 
     // 2.5 绑定表单提交事件
     bindSubmit('newsForm', 'articles', getNewsData, loadNews, 'news');
@@ -108,12 +149,19 @@ async function initAdmin() {
     document.getElementById('searchStd').oninput = debounce(() => loadStds());
 }
 
-// =================== 3. 表单数据获取 ===================
+// =================== 3. 表单数据获取 (支持 URL 优先) ===================
 
 // [新闻数据]
 const getNewsData = async () => {
+    // 逻辑：优先取 URL 输入框的值。如果为空，再看是否有文件上传。
+    const manualUrl = document.getElementById('newsCoverUrl').value.trim();
     const file = document.getElementById('newsCover').files[0];
-    const imageUrl = file ? await uploadImage(file) : null;
+    
+    let finalImageUrl = manualUrl;
+    if (!finalImageUrl && file) {
+        finalImageUrl = await uploadImage(file);
+    }
+
     return {
         title: document.getElementById('newsTitle').value,
         category: document.getElementById('newsCategory').value,
@@ -122,66 +170,66 @@ const getNewsData = async () => {
         publish_date: document.getElementById('newsPublishDate').value,
         summary: document.getElementById('newsSummary').value,
         content: quillNews ? quillNews.root.innerHTML : '',
-        ...(imageUrl && { image_url: imageUrl }) 
+        // 仅当有最终 URL 时更新
+        ...(finalImageUrl && { image_url: finalImageUrl }) 
     };
 };
 
-// [活动数据] - 核心修复：上传 Bucket 和 字段名
+// [活动数据]
 const getActData = async () => {
-    const imgFile = document.getElementById('actImg').files[0];
-    const docFile = document.getElementById('actFile').files[0];
-    
     const submitBtn = document.querySelector('#actForm button[type="submit"]');
     const originalText = submitBtn.innerText;
 
-    let imageUrl = null;
-    let attachUrl = null;
+    // --- 图片处理逻辑 ---
+    const imgUrlInput = document.getElementById('actImgUrl').value.trim();
+    const imgFile = document.getElementById('actImg').files[0];
+    let finalImgUrl = imgUrlInput;
 
-    // 1. 上传封面图 -> news-images
-    if (imgFile) {
+    if (!finalImgUrl && imgFile) {
         try {
             submitBtn.innerText = "上传图片中...";
-            imageUrl = await uploadFile(imgFile, 'news-images');
+            finalImgUrl = await uploadFile(imgFile, 'news-images');
         } catch (e) {
             alert("封面图上传失败: " + e.message);
+            submitBtn.innerText = originalText;
             throw e; 
         }
     }
 
-    // 2. 上传附件 -> activity-files
-    if (docFile) {
+    // --- 附件处理逻辑 ---
+    const fileUrlInput = document.getElementById('actFileUrl').value.trim();
+    const docFile = document.getElementById('actFile').files[0];
+    let finalAttachUrl = fileUrlInput;
+
+    if (!finalAttachUrl && docFile) {
         try {
             submitBtn.innerText = "上传附件中...";
-            attachUrl = await uploadFile(docFile, 'activity-files');
+            finalAttachUrl = await uploadFile(docFile, 'activity-files');
         } catch (e) {
             alert("附件上传失败 (请检查 activity-files 存储桶权限): " + e.message);
+            submitBtn.innerText = originalText;
             throw e;
         }
     }
 
     submitBtn.innerText = originalText;
 
-    // 3. 构建数据对象
+    // 构建数据对象
     return {
         title: document.getElementById('actTitle').value,
         category: document.getElementById('actCategory').value,
         date_range: document.getElementById('actDate').value,
         location: document.getElementById('actLoc').value,
         summary: document.getElementById('actSummary').value,
-        // 组织机构
         organizer: document.getElementById('actOrganizer').value || '国家市场监督管理总局技术创新中心',
         contractor: document.getElementById('actContractor').value || '中国汽车工程研究院股份有限公司',
         contact: document.getElementById('actContact').value,
         
-        // 时间线数据
         timeline: getTimelineFromDOM(), 
-        // 富文本
         content: quillAct ? quillAct.root.innerHTML : '',
         
-        // 仅当上传新文件时更新 URL
-        ...(imageUrl && { image_url: imageUrl }),
-        // ⚠️ 修正：数据库字段是 attachment_url
-        ...(attachUrl && { attachment_url: attachUrl })   
+        ...(finalImgUrl && { image_url: finalImgUrl }),
+        ...(finalAttachUrl && { attachment_url: finalAttachUrl })   
     };
 };
 
@@ -196,11 +244,16 @@ const getProjData = async () => ({
 
 // [标准数据]
 const getStdData = async () => {
+    const manualUrl = document.getElementById('stdPdfUrl').value.trim();
     const file = document.getElementById('stdPdf').files[0];
-    // 标准建议也使用 uploadFile 上传到 standards-pdf，但为了兼容暂时用 uploadImage(news-images) 或者按需修改
-    // 这里如果 standards-pdf 桶存在，建议使用: await uploadFile(file, 'standards-pdf');
-    // 目前保持原样以免出错，如果需要请手动修改 'news-images' 为 'standards-pdf'
-    const pdfUrl = (file && !document.getElementById('noPdfUpload')?.checked) ? await uploadImage(file) : null;
+    const noUpload = document.getElementById('noPdfUpload').checked;
+
+    let finalPdfUrl = manualUrl;
+    
+    // 如果没有手动 URL 且 未勾选“不上传” 且 有文件
+    if (!finalPdfUrl && !noUpload && file) {
+        finalPdfUrl = await uploadImage(file); 
+    }
     
     return {
         code: document.getElementById('stdCode').value,
@@ -212,7 +265,7 @@ const getStdData = async () => {
         department: document.getElementById('stdDepartment').value,
         description: document.getElementById('stdDescription').value,
         allow_download: document.getElementById('stdAllowDownload').checked,
-        ...(pdfUrl && { pdf_url: pdfUrl })
+        ...(finalPdfUrl && { pdf_url: finalPdfUrl })
     };
 };
 
@@ -243,7 +296,7 @@ function bindSubmit(formId, table, dataFn, reloadFn, prefix) {
             
             clearDraft(prefix);
             cancelEdit(prefix); 
-            reloadFn(); // 刷新列表
+            reloadFn(); 
 
         } catch (err) {
             console.error(err);
@@ -377,6 +430,16 @@ window.editItem = async (prefix, id) => {
             document.getElementById('newsAuthor').value = data.author || '';
             document.getElementById('newsPublishDate').value = data.publish_date || '';
             if (quillNews) quillNews.root.innerHTML = data.content || ''; 
+            
+            // --- 新闻图片回显 ---
+            document.getElementById('newsCoverUrl').value = data.image_url || '';
+            if (data.image_url) {
+                document.getElementById('newsCoverPreviewBox').classList.remove('hidden');
+                document.getElementById('newsCoverPreview').src = data.image_url;
+                document.getElementById('newsCoverLink').href = data.image_url;
+            } else {
+                document.getElementById('newsCoverPreviewBox').classList.add('hidden');
+            }
         } 
         else if (prefix === 'act') {
             document.getElementById('actTitle').value = data.title;
@@ -392,6 +455,26 @@ window.editItem = async (prefix, id) => {
             renderTimelineToDOM(data.timeline || []);
             
             if (quillAct) quillAct.root.innerHTML = data.content || ''; 
+            
+            // --- 活动图片回显 ---
+            document.getElementById('actImgUrl').value = data.image_url || '';
+            if (data.image_url) {
+                document.getElementById('actImgPreviewBox').classList.remove('hidden');
+                document.getElementById('actImgPreview').src = data.image_url;
+            } else {
+                document.getElementById('actImgPreviewBox').classList.add('hidden');
+            }
+
+            // --- 活动附件回显 ---
+            document.getElementById('actFileUrl').value = data.attachment_url || '';
+            if (data.attachment_url) {
+                const link = document.getElementById('actFilePreviewLink');
+                link.href = data.attachment_url;
+                link.classList.remove('hidden');
+                link.innerText = ' 下载现有附件';
+            } else {
+                document.getElementById('actFilePreviewLink').classList.add('hidden');
+            }
         } 
         else if (prefix === 'proj') {
             document.getElementById('projName').value = data.name;
@@ -410,6 +493,16 @@ window.editItem = async (prefix, id) => {
             document.getElementById('stdDepartment').value = data.department || '';
             document.getElementById('stdDescription').value = data.description || '';
             document.getElementById('stdAllowDownload').checked = data.allow_download !== false;
+            
+            // --- 标准 PDF 回显 ---
+            document.getElementById('stdPdfUrl').value = data.pdf_url || '';
+            if (data.pdf_url) {
+                const link = document.getElementById('stdPdfPreviewLink');
+                link.href = data.pdf_url;
+                link.classList.remove('hidden');
+            } else {
+                document.getElementById('stdPdfPreviewLink').classList.add('hidden');
+            }
         }
 
         document.getElementById(`${prefix}Form`).scrollIntoView({ behavior: 'smooth' });
@@ -423,12 +516,23 @@ window.cancelEdit = (prefix) => {
     document.getElementById(`${prefix}CancelBtn`).classList.add('hidden');
     document.getElementById(`${prefix}FormTitle`).innerText = "新增";
     
-    if (prefix === 'news' && quillNews) quillNews.setContents([]);
+    // 清理预览
+    if (prefix === 'news') {
+        if (quillNews) quillNews.setContents([]);
+        document.getElementById('newsCoverPreviewBox').classList.add('hidden');
+        document.getElementById('newsCoverPreview').src = "";
+    }
     if (prefix === 'act') {
         document.getElementById('timeline-container').innerHTML = ''; 
         if(quillAct) quillAct.setContents([]);
+        document.getElementById('actImgPreviewBox').classList.add('hidden');
+        document.getElementById('actImgPreview').src = "";
+        document.getElementById('actFilePreviewLink').classList.add('hidden');
     }
-    if (prefix === 'std') document.getElementById('stdAllowDownload').checked = true;
+    if (prefix === 'std') {
+        document.getElementById('stdAllowDownload').checked = true;
+        document.getElementById('stdPdfPreviewLink').classList.add('hidden');
+    }
 
     restoreDraft(prefix);
 };
@@ -469,6 +573,41 @@ function renderTimelineToDOM(timelineData) {
         timelineData.forEach(item => window.addTimelineRow(item.date, item.event));
     }
 }
+
+// =================== 7. 图片排版辅助 (支持新闻和活动) ===================
+// 一键统一图片尺寸功能
+window.formatContentImages = (type) => {
+    let editor = null;
+    if (type === 'news') editor = quillNews;
+    else if (type === 'act') editor = quillAct;
+
+    if (!editor) return alert("编辑器未初始化");
+
+    const editorRoot = editor.root;
+    const images = editorRoot.querySelectorAll('img');
+
+    if (images.length === 0) {
+        return alert("正文中没有检测到图片");
+    }
+
+    let count = 0;
+    images.forEach(img => {
+        // 设置样式：宽度100%，高度自动，居中显示
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.style.display = 'block';
+        img.style.margin = '10px auto'; 
+        img.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)'; 
+        img.removeAttribute('width'); 
+        img.removeAttribute('height');
+        count++;
+    });
+
+    // 强制触发更新，确保 changes 被记录
+    editor.update(); 
+    
+    alert(`已自动调整 ${count} 张图片的尺寸为 100% 宽度适配。`);
+};
 
 // [通用] 自动暂存
 function initAutoSave(prefix, fields, contentFn) {

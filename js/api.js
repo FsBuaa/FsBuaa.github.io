@@ -91,10 +91,25 @@ export async function deleteItem(table, id) {
 // [Update] 修改数据
 export async function updateItem(table, id, data) {
     if (!supabase) throw new Error("数据库未连接");
-    const { error } = await supabase.from(table).update(data).eq('id', id);
-    if (error) throw error;
-}
+    
+    // .select() 是为了获取返回数据，同时 .update() 会返回 status
+    // 关键：Supabase v2 update 默认不返回 count，除非加 select 或 count 选项，但 update 操作本身在 response 里包含 count
+    // 我们这里直接判断 error，如果没有 error 但 data 为空（受 RLS 限制），则手动抛出异常
+    
+    const { data: result, error } = await supabase
+        .from(table)
+        .update(data)
+        .eq('id', id)
+        .select(); // 加上 select() 以便确认数据确实被返回了
 
+    if (error) throw error;
+
+    // 核心修复逻辑：
+    // 如果 result 是空数组，说明没有找到 ID 对应的行，或者 RLS 策略禁止了 Update
+    if (!result || result.length === 0) {
+        throw new Error("更新失败：未找到记录或权限不足 (请检查 Supabase RLS 的 UPDATE 策略)");
+    }
+}
 // [Read - Single] 获取单条详情
 export async function getItemById(table, id) {
     if (!supabase) return null;
